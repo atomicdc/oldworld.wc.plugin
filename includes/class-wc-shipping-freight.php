@@ -22,10 +22,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $this->method_title = __('Freight Shipping', 'woocommerce-shipping-freight');
         $this->method_description = __('The Freight Shipping extension obtains rates dynamically via API during cart/checkout.',
             'woocommerce-shipping-freight');
-        /*$this->rateservice_version = 16;*/
-        /*$this->addressvalidationservice_version = 2;*/
-        $this->default_boxes = include(dirname(__FILE__).'/data/data-box-sizes.php');
-        /*$this->services = include(dirname(__FILE__).'/data/data-service-codes.php');*/
+        $this->default_boxes = include(__DIR__.'/data/data-box-sizes.php');
+        $this->services = include(__DIR__.'/data/data-service-codes.php');
         $this->supports = ['shipping-zones', 'instance-settings', 'settings',];
         $this->init();
     }
@@ -60,15 +58,11 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             str_replace(' ', '', strtoupper($this->get_option('origin'))));
         $this->origin_country = apply_filters('woocommerce_freight_origin_country_code',
             WC()->countries->get_base_country());
-        /*$this->account_number = $this->get_option('account_number');*/
-        /*$this->meter_number = $this->get_option('meter_number');*/
-        /*$this->smartpost_hub = $this->get_option('smartpost_hub');*/
         $this->api_url = $this->get_option('api_url');
         $this->api_user = $this->get_option('api_user');
         $this->api_pass = $this->get_option('api_pass');
         /*$this->production = (($bool = $this->get_option('production')) && $bool === 'yes');*/
         $this->debug = (($bool = $this->get_option('debug')) && $bool === 'yes');
-        /*$this->insure_contents = (($bool = $this->get_option('insure_contents')) && $bool === 'yes');*/
         $this->request_type = $this->get_option('request_type', 'LIST');
         $this->packing_method = $this->get_option('packing_method', 'per_item');
         $this->boxes = $this->get_option('boxes', []);
@@ -76,24 +70,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $this->offer_rates = $this->get_option('offer_rates', 'all');
         $this->residential = (($bool = $this->get_option('residential')) && $bool === 'yes');
         $this->freight_enabled = (($bool = $this->get_option('freight_enabled')) && $bool === 'yes');
-        /*$this->freight_one_rate = (($bool = $this->get_option('freight_one_rate')) && $bool === 'yes');*/
-        /*$this->direct_distribution = (($bool = $this->get_option('direct_distribution')) && $bool === 'yes');*/
-        /*$this->freight_one_rate_package_ids = [
-            'FREIGHT_SMALL_BOX',
-            'FREIGHT_MEDIUM_BOX',
-            'FREIGHT_LARGE_BOX',
-            'FREIGHT_EXTRA_LARGE_BOX',
-            'FREIGHT_PAK',
-            'FREIGHT_ENVELOPE',
-            'FREIGHT_TUBE',
-        ];*/
-        /*$this->freight_one_rate_package_ids = [
-            'FREIGHT_CRATE', //todo: how does the api use this?
-        ];*/
 
         if ($this->freight_enabled) {
             $this->freight_class = str_replace(['CLASS_', '.'], ['', '_'], $this->get_option('freight_class'));
-            /*$this->freight_number = $this->get_option('freight_number', $this->account_number);*/
             $this->freight_billing_street = $this->get_option('freight_billing_street');
             $this->freight_billing_street_2 = $this->get_option('freight_billing_street_2');
             $this->freight_billing_city = $this->get_option('freight_billing_city');
@@ -109,13 +88,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             $this->freight_shipper_country = $this->get_option('freight_shipper_country');
             $this->freight_shipper_residential = (($bool = $this->get_option('freight_shipper_residential')) && $bool === 'yes');
         }
-        /*switch (WC()->countries->get_base_country()) {
-            case 'US':
-                if ('USD' !== get_woocommerce_currency()) {
-                    $this->insure_contents = false;
-                }
-                break;
-        }*/
     }
 
     /**
@@ -187,18 +159,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'description' => __('Description should go here',
                     'woocommerce-shipping-freight'),
             ],
-            /*'account_number' => [
-                'title' => __('Freight Shipping Account Number', 'woocommerce-shipping-freight'),
-                'type' => 'text',
-                'description' => '',
-                'default' => '',
-            ],*/
-            /*'meter_number' => [
-                'title' => __('Freight Meter Number', 'woocommerce-shipping-freight'),
-                'type' => 'text',
-                'description' => '',
-                'default' => '',
-            ],*/
             'api_url' => [
                 'title' => __('Web Services URL', 'woocommerce-shipping-frieght'),
                 'type' => 'text',
@@ -692,15 +652,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                         'Password' => $this->api_pass,
                     ],
                 ];
-                $request['ClientDetail'] = [
-                    'AccountNumber' => $this->account_number,
-                    'MeterNumber' => $this->meter_number,
-                ];
                 $request['TransactionDetail'] = ['CustomerTransactionId' => ' *** Address Validation Request v2 from WooCommerce ***'];
-                $request['Version'] = [
-                    'ServiceId' => 'aval', 'Major' => $this->addressvalidationservice_version, 'Intermediate' => '0',
-                    'Minor' => '0',
-                ];
                 $request['RequestTimestamp'] = date('c');
                 $request['Options'] = [
                     'CheckResidentialStatus' => 1,
@@ -777,13 +729,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             'CustomerTransactionId' => ' *** WooCommerce Rate Request ***',
         ];*/
 
-        /*$request['Version'] = [
-            'ServiceId' => 'crs',
-            'Major' => $this->rateservice_version,
-            'Intermediate' => '0',
-            'Minor' => '0',
-        ];*/
-
         //$request['ReturnTransitAndCommit'] = false;
         /*$request['RequestedShipment']['PreferredCurrency'] = get_woocommerce_currency();
         $request['RequestedShipment']['DropoffType'] = 'REGULAR_PICKUP';
@@ -793,16 +738,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             'Address' => [
                 'PostalCode' => $this->origin,
                 'CountryCode' => $this->origin_country,
-            ],
-        ];*/
-
-        /*$request['RequestedShipment']['ShippingChargesPayment'] = [
-            'PaymentType' => 'SENDER',
-            'Payor' => [
-                'ResponsibleParty' => [
-                    'AccountNumber' => $this->account_number,
-                    'CountryCode' => WC()->countries->get_base_country(),
-                ],
             ],
         ];*/
 
@@ -1234,36 +1169,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             }
         }
     }
-
-    /**
-     * Determine if the current shipping is to be done internationally
-     *
-     * @return bool
-     */
-    /*public function is_shipping_internationally()
-    {
-        // compare base and package country: not equal for international shipping
-        return (WC()->countries->get_base_country() !== $this->package['destination']['country'] && 'CA' !== $this->package['destination']['country'] && 'US' !== $this->package['destination']['country']);
-    }*/
-
-    /**
-     *
-     * @return bool
-     */
-    /*public function need_direct_distribution()
-    {
-        if ($this->direct_distribution) {
-            if ('US' === WC()->countries->get_base_country() && 'CA' === $this->package['destination']['country']) {
-                return true;
-            }
-
-            if ('CA' === WC()->countries->get_base_country() && 'US' === $this->package['destination']['country']) {
-                return true;
-            }
-        }
-
-        return false;
-    }*/
 
     /**
      * sort_rates function.

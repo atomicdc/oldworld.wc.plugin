@@ -66,18 +66,6 @@ return [
         'description' => __('Settings for the API endpoint.',
             'woocommerce-shipping-freight'),
     ],
-    /*'account_number' => [
-        'title' => __('Freight Account Number', 'woocommerce-shipping-freight'),
-        'type' => 'text',
-        'description' => '',
-        'default' => '',
-    ],*/
-    /*'meter_number' => [
-        'title' => __('Freight Meter Number', 'woocommerce-shipping-freight'),
-        'type' => 'text',
-        'description' => '',
-        'default' => '',
-    ],*/
     'api_url' => [
         'title' => __('Web Services URL', 'woocommerce-shipping-freight'),
         'type' => 'text',
@@ -148,33 +136,6 @@ return [
             'woocommerce-shipping-freight'),
         'desc_tip' => true,
     ],
-    /*'insure_contents' => [
-        'title' => __('Insurance', 'woocommerce-shipping-freight'),
-        'label' => __('Enable Insurance', 'woocommerce-shipping-freight'),
-        'type' => 'checkbox',
-        'default' => 'yes',
-        'desc_tip' => true,
-        'description' => __('####', 'woocommerce-shipping-freight'),
-    ],*/
-    /*'freight_one_rate' => [
-        'title' => __('Freight Shipping One Rate', 'woocommerce-shipping-freight'),
-        'label' => sprintf(__('Enable %sFreight One Rates%s', 'woocommerce-shipping-freight'),
-            '###', ' ###'),
-        'type' => 'checkbox',
-        'default' => 'no',
-        'desc_tip' => true,
-        'description' => __('Freight Rates will be offered if the items are packed into a valid crate, and the origin and destination is the US.',
-            'woocommerce-shipping-freight'),
-    ],*/
-    /*'direct_distribution' => [
-        'title' => __('International Ground Direct Distribution', 'woocommerce-shipping-freight'),
-        'label' => __('Enable direct distribution Rates.', 'woocommerce-shipping-freight'),
-        'type' => 'checkbox',
-        'default' => 'no',
-        'desc_tip' => true,
-        'description' => __('Enable to get direct distribution rates if your account has this enabled.',
-            'woocommerce-shipping-freight'),
-    ],*/
     /*'request_type' => [
         'title' => __('Request Type', 'woocommerce-shipping-freight'),
         'type' => 'select',
@@ -187,14 +148,6 @@ return [
         ],
         'description' => __('Choose whether to return List or Account (discounted) rates from the API.',
             'woocommerce-shipping-freight'),
-    ],*/
-    /*'smartpost_hub' => [
-        'title' => __('Freight SmartPost Hub', 'woocommerce-shipping-freight'),
-        'type' => 'select',
-        'description' => __('Only required if using SmartPost.', 'woocommerce-shipping-freight'),
-        'desc_tip' => true,
-        'default' => '',
-        'options' => $smartpost_hubs,
     ],*/
     'offer_rates' => [
         'title' => __('Offer Rates', 'woocommerce-shipping-freight'),
