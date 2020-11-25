@@ -63,7 +63,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         /*$this->account_number = $this->get_option('account_number');*/
         /*$this->meter_number = $this->get_option('meter_number');*/
         /*$this->smartpost_hub = $this->get_option('smartpost_hub');*/
-        $this->api_key = $this->get_option('api_key');
+        $this->api_user = $this->get_option('api_user');
         $this->api_pass = $this->get_option('api_pass');
         /*$this->production = (($bool = $this->get_option('production')) && $bool === 'yes');*/
         $this->debug = (($bool = $this->get_option('debug')) && $bool === 'yes');
@@ -196,10 +196,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'description' => '',
                 'default' => '',
             ],*/
-            'api_key' => [
+            'api_user' => [
                 'title' => __('Web Services Username', 'woocommerce-shipping-freight'),
                 'type' => 'text',
-                'description' => '',
+                'description' => 'Username needed to access the API.',
                 'default' => '',
                 'custom_attributes' => [
                     'autocomplete' => 'off',
@@ -208,7 +208,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             'api_pass' => [
                 'title' => __('Web Services Password', 'woocommerce-shipping-freight'),
                 'type' => 'password',
-                'description' => '',
+                'description' => 'Password needed to access the API.',
                 'default' => '',
                 'custom_attributes' => [
                     'autocomplete' => 'off',
@@ -680,7 +680,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
                 $request['WebAuthenticationDetail'] = [
                     'UserCredential' => [
-                        'Key' => $this->api_key,
+                        'User' => $this->api_user,
                         'Password' => $this->api_pass,
                     ],
                 ];
@@ -759,7 +759,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         // Prepare Shipping Request for Freight.
         /*$request['WebAuthenticationDetail'] = [
             'UserCredential' => [
-                'Key' => $this->api_key,
+                'User' => $this->api_user,
                 'Password' => $this->api_pass,
             ],
         ];*/

@@ -79,10 +79,10 @@ return [
         'description' => '',
         'default' => '',
     ],*/
-    /*'api_key' => [
-        'title' => __('Web Services Key', 'woocommerce-shipping-freight'),
+    'api_user' => [
+        'title' => __('Web Services Username', 'woocommerce-shipping-freight'),
         'type' => 'text',
-        'description' => '',
+        'description' => 'Username needed to access the API.',
         'default' => '',
         'custom_attributes' => [
             'autocomplete' => 'off',
@@ -91,13 +91,13 @@ return [
     'api_pass' => [
         'title' => __('Web Services Password', 'woocommerce-shipping-freight'),
         'type' => 'password',
-        'description' => '',
+        'description' => 'Password needed to access the API.',
         'default' => '',
         'custom_attributes' => [
             'autocomplete' => 'off',
         ],
-    ],*/
-    'production' => [
+    ],
+    /*'production' => [
         'title' => __('Production Key', 'woocommerce-shipping-freight'),
         'label' => __('This is a production key', 'woocommerce-shipping-freight'),
         'type' => 'checkbox',
@@ -105,7 +105,7 @@ return [
         'desc_tip' => true,
         'description' => __('If this is a production API key and not a developer key, check this box.',
             'woocommerce-shipping-freight'),
-    ],
+    ],*/
     /*'packing' => [
         'title' => __('Packages', 'woocommerce-shipping-freight'),
         'type' => 'title',
@@ -167,7 +167,7 @@ return [
         'description' => __('Enable to get direct distribution rates if your account has this enabled.',
             'woocommerce-shipping-freight'),
     ],*/
-    'request_type' => [
+    /*'request_type' => [
         'title' => __('Request Type', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'default' => 'LIST',
@@ -179,7 +179,7 @@ return [
         ],
         'description' => __('Choose whether to return List or Account (discounted) rates from the API.',
             'woocommerce-shipping-freight'),
-    ],
+    ],*/
     /*'smartpost_hub' => [
         'title' => __('Freight SmartPost Hub', 'woocommerce-shipping-freight'),
         'type' => 'select',
@@ -188,7 +188,7 @@ return [
         'default' => '',
         'options' => $smartpost_hubs,
     ],*/
-    'offer_rates' => [
+    /*'offer_rates' => [
         'title' => __('Offer Rates', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'description' => '',
@@ -197,10 +197,10 @@ return [
             'all' => __('Offer the customer all returned rates', 'woocommerce-shipping-freight'),
             'cheapest' => __('Offer the customer the cheapest rate only, anonymously', 'woocommerce-shipping-freight'),
         ],
-    ],
-    'services' => [
+    ],*/
+    /*'services' => [
         'type' => 'services',
-    ],
+    ],*/
     'freight' => [
         'title' => __('Freight LTL Freight', 'woocommerce-shipping-freight'),
         'type' => 'title',
