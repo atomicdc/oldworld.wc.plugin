@@ -20,8 +20,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $this->id = 'freight';
         $this->instance_id = absint($instance_id);
         $this->method_title = __('Freight Shipping', 'woocommerce-shipping-freight');
-        $this->method_description = __('The Freight Shipping extension obtains rates dynamically via API during cart/checkout.',
-            'woocommerce-shipping-freight');
+        $this->method_description = __('The Freight Shipping extension obtains rates dynamically via API during cart/checkout.', 'woocommerce-shipping-freight');
         $this->default_boxes = include(__DIR__.'/data/data-box-sizes.php');
         $this->services = include(__DIR__.'/data/data-service-codes.php');
         $this->supports = ['shipping-zones', 'instance-settings', 'settings',];
@@ -54,10 +53,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     private function set_settings()
     {
         $this->title = $this->get_option('title', $this->method_title);
-        $this->origin = apply_filters('woocommerce_freight_origin_postal_code',
-            str_replace(' ', '', strtoupper($this->get_option('origin'))));
-        $this->origin_country = apply_filters('woocommerce_freight_origin_country_code',
-            WC()->countries->get_base_country());
+        $this->origin = apply_filters('woocommerce_freight_origin_postal_code', str_replace(' ', '', strtoupper($this->get_option('origin'))));
+        $this->origin_country = apply_filters('woocommerce_freight_origin_country_code', WC()->countries->get_base_country());
         $this->api_url = $this->get_option('api_url');
         $this->api_user = $this->get_option('api_user');
         $this->api_pass = $this->get_option('api_pass');
