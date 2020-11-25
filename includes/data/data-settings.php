@@ -9,9 +9,6 @@ if (!defined('ABSPATH')) {
 $shipping_class_link = version_compare(WC_VERSION, '2.6',
     '>=') ? admin_url('admin.php?page=wc-settings&tab=shipping&section=classes') : admin_url('edit-tags.php?taxonomy=product_shipping_class&post_type=product');
 
-/**
- * Array of settings
- */
 return [
     'title' => [
         'title' => __('Method Title', 'woocommerce-shipping-freight'),
@@ -27,13 +24,13 @@ return [
         'default' => '',
         'desc_tip' => true,
     ],
-    /*'packing' => [
+    'packing' => [
         'title' => __('Packages', 'woocommerce-shipping-freight'),
         'type' => 'title',
         'description' => __('The following settings determine how items are packed before being sent to Freight.',
             'woocommerce-shipping-freight'),
-    ],*/
-    /*'packing_method' => [
+    ],
+    'packing_method' => [
         'title' => __('Parcel Packing Method', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'default' => '',
@@ -42,10 +39,10 @@ return [
             'per_item' => __('Default: Pack items individually', 'woocommerce-shipping-freight'),
             'box_packing' => __('Recommended: Pack into boxes with weights and dimensions', 'woocommerce-shipping-freight'),
         ],
-    ],*/
-    /*'boxes' => [
+    ],
+    'boxes' => [
         'type' => 'box_packing',
-    ],*/
+    ],
     'rates' => [
         'title' => __('Rates and Services', 'woocommerce-shipping-freight'),
         'type' => 'title',
@@ -115,7 +112,7 @@ return [
         'description' => '',
         'default' => 'all',
         'options' => [
-            'all' => __('Offer the customer all returned rates', 'woocommerce-shipping-freight'),
+            /*'all' => __('Offer the customer all returned rates', 'woocommerce-shipping-freight'),*/
             'cheapest' => __('Offer the customer the cheapest rate only, anonymously', 'woocommerce-shipping-freight'),
         ],
     ],

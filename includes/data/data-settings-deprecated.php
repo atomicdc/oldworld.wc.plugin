@@ -5,10 +5,9 @@ if (!defined('ABSPATH')) {
 }
 
 $freight_classes = include('data-freight-classes.php');
-$smartpost_hubs = include('data-smartpost-hubs.php');
-$smartpost_hubs = ['' => __('N/A', 'woocommerce-shipping-freight')] + $smartpost_hubs;
-$shipping_class_link = version_compare(WC_VERSION, '2.6',
-    '>=') ? admin_url('admin.php?page=wc-settings&tab=shipping&section=classes') : admin_url('edit-tags.php?taxonomy=product_shipping_class&post_type=product');
+$shipping_class_link = version_compare(WC_VERSION, '2.6', '>=')
+    ? admin_url('admin.php?page=wc-settings&tab=shipping&section=classes')
+    : admin_url('edit-tags.php?taxonomy=product_shipping_class&post_type=product');
 
 /**
  * Array of settings
@@ -64,7 +63,7 @@ return [
     'api' => [
         'title' => __('API Settings', 'woocommerce-shipping-freight'),
         'type' => 'title',
-        'description' => __('#',
+        'description' => __('Settings for the API endpoint.',
             'woocommerce-shipping-freight'),
     ],
     /*'account_number' => [
@@ -79,6 +78,15 @@ return [
         'description' => '',
         'default' => '',
     ],*/
+    'api_url' => [
+        'title' => __('Web Services URL', 'woocommerce-shipping-freight'),
+        'type' => 'text',
+        'description' => 'URL of the actual API endpoint to communicate with.',
+        'default' => '',
+        'custom_attributes' => [
+            'autocomplete' => 'off',
+        ],
+    ],
     'api_user' => [
         'title' => __('Web Services Username', 'woocommerce-shipping-freight'),
         'type' => 'text',
@@ -106,13 +114,13 @@ return [
         'description' => __('If this is a production API key and not a developer key, check this box.',
             'woocommerce-shipping-freight'),
     ],*/
-    /*'packing' => [
+    'packing' => [
         'title' => __('Packages', 'woocommerce-shipping-freight'),
         'type' => 'title',
         'description' => __('The following settings determine how items are packed before being sent to Freight Shipping.',
             'woocommerce-shipping-freight'),
-    ],*/
-    /*'packing_method' => [
+    ],
+    'packing_method' => [
         'title' => __('Parcel Packing Method', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'default' => '',
@@ -121,10 +129,10 @@ return [
             'per_item' => __('Default: Pack items individually', 'woocommerce-shipping-freight'),
             'box_packing' => __('Recommended: Pack into boxes with weights and dimensions', 'woocommerce-shipping-freight'),
         ],
-    ],*/
-    /*'boxes' => [
+    ],
+    'boxes' => [
         'type' => 'box_packing',
-    ],*/
+    ],
     'rates' => [
         'title' => __('Rates and Services', 'woocommerce-shipping-freight'),
         'type' => 'title',
@@ -188,30 +196,30 @@ return [
         'default' => '',
         'options' => $smartpost_hubs,
     ],*/
-    /*'offer_rates' => [
+    'offer_rates' => [
         'title' => __('Offer Rates', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'description' => '',
         'default' => 'all',
         'options' => [
-            'all' => __('Offer the customer all returned rates', 'woocommerce-shipping-freight'),
+            /*'all' => __('Offer the customer all returned rates', 'woocommerce-shipping-freight'),*/
             'cheapest' => __('Offer the customer the cheapest rate only, anonymously', 'woocommerce-shipping-freight'),
         ],
-    ],*/
-    /*'services' => [
+    ],
+    'services' => [
         'type' => 'services',
-    ],*/
+    ],
     'freight' => [
-        'title' => __('Freight LTL Freight', 'woocommerce-shipping-freight'),
+        'title' => __('LTL Freight', 'woocommerce-shipping-freight'),
         'type' => 'title',
-        'description' => __('If your account supports Freight, we need some additional details to get LTL rates. Note: These rates require the customers CITY so won\'t display until checkout.',
+        'description' => __('Note: These rates require the customers CITY so won\'t display until checkout.',
             'woocommerce-shipping-freight'),
     ],
     'freight_enabled' => [
         'title' => __('Enable', 'woocommerce-shipping-freight'),
         'label' => __('Enable Freight', 'woocommerce-shipping-freight'),
         'type' => 'checkbox',
-        'default' => 'no',
+        'default' => 'yes',
     ],
     /*'freight_number' => [
         'title' => __('Freight Freight Account Number', 'woocommerce-shipping-freight'),
@@ -288,7 +296,7 @@ return [
     ],
     'freight_class' => [
         'title' => __('Default Freight Class', 'woocommerce-shipping-freight'),
-        'description' => sprintf(__('This is the default freight class for shipments. This can be overridden using <a href="%s">shipping classes</a>',
+        'description' => sprintf(__('This is the default freight class for shipments. This can be overridden using <a href="%s">shipping classes</a> or individual product settings.',
             'woocommerce-shipping-freight'), $shipping_class_link),
         'type' => 'select',
         'default' => '50',
