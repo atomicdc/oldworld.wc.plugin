@@ -67,19 +67,19 @@ return [
         'description' => __('#',
             'woocommerce-shipping-freight'),
     ],
-    'account_number' => [
+    /*'account_number' => [
         'title' => __('Freight Account Number', 'woocommerce-shipping-freight'),
         'type' => 'text',
         'description' => '',
         'default' => '',
-    ],
-    'meter_number' => [
+    ],*/
+    /*'meter_number' => [
         'title' => __('Freight Meter Number', 'woocommerce-shipping-freight'),
         'type' => 'text',
         'description' => '',
         'default' => '',
-    ],
-    'api_key' => [
+    ],*/
+    /*'api_key' => [
         'title' => __('Web Services Key', 'woocommerce-shipping-freight'),
         'type' => 'text',
         'description' => '',
@@ -96,7 +96,7 @@ return [
         'custom_attributes' => [
             'autocomplete' => 'off',
         ],
-    ],
+    ],*/
     'production' => [
         'title' => __('Production Key', 'woocommerce-shipping-freight'),
         'label' => __('This is a production key', 'woocommerce-shipping-freight'),
@@ -106,13 +106,13 @@ return [
         'description' => __('If this is a production API key and not a developer key, check this box.',
             'woocommerce-shipping-freight'),
     ],
-    'packing' => [
+    /*'packing' => [
         'title' => __('Packages', 'woocommerce-shipping-freight'),
         'type' => 'title',
         'description' => __('The following settings determine how items are packed before being sent to Freight Shipping.',
             'woocommerce-shipping-freight'),
-    ],
-    'packing_method' => [
+    ],*/
+    /*'packing_method' => [
         'title' => __('Parcel Packing Method', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'default' => '',
@@ -121,10 +121,10 @@ return [
             'per_item' => __('Default: Pack items individually', 'woocommerce-shipping-freight'),
             'box_packing' => __('Recommended: Pack into boxes with weights and dimensions', 'woocommerce-shipping-freight'),
         ],
-    ],
-    'boxes' => [
+    ],*/
+    /*'boxes' => [
         'type' => 'box_packing',
-    ],
+    ],*/
     'rates' => [
         'title' => __('Rates and Services', 'woocommerce-shipping-freight'),
         'type' => 'title',
@@ -140,15 +140,15 @@ return [
             'woocommerce-shipping-freight'),
         'desc_tip' => true,
     ],
-    'insure_contents' => [
+    /*'insure_contents' => [
         'title' => __('Insurance', 'woocommerce-shipping-freight'),
         'label' => __('Enable Insurance', 'woocommerce-shipping-freight'),
         'type' => 'checkbox',
         'default' => 'yes',
         'desc_tip' => true,
         'description' => __('####', 'woocommerce-shipping-freight'),
-    ],
-    'freight_one_rate' => [
+    ],*/
+    /*'freight_one_rate' => [
         'title' => __('Freight Shipping One Rate', 'woocommerce-shipping-freight'),
         'label' => sprintf(__('Enable %sFreight One Rates%s', 'woocommerce-shipping-freight'),
             '###', ' ###'),
@@ -157,8 +157,8 @@ return [
         'desc_tip' => true,
         'description' => __('Freight Rates will be offered if the items are packed into a valid crate, and the origin and destination is the US.',
             'woocommerce-shipping-freight'),
-    ],
-    'direct_distribution' => [
+    ],*/
+    /*'direct_distribution' => [
         'title' => __('International Ground Direct Distribution', 'woocommerce-shipping-freight'),
         'label' => __('Enable direct distribution Rates.', 'woocommerce-shipping-freight'),
         'type' => 'checkbox',
@@ -166,7 +166,7 @@ return [
         'desc_tip' => true,
         'description' => __('Enable to get direct distribution rates if your account has this enabled.',
             'woocommerce-shipping-freight'),
-    ],
+    ],*/
     'request_type' => [
         'title' => __('Request Type', 'woocommerce-shipping-freight'),
         'type' => 'select',
@@ -180,14 +180,14 @@ return [
         'description' => __('Choose whether to return List or Account (discounted) rates from the API.',
             'woocommerce-shipping-freight'),
     ],
-    'smartpost_hub' => [
+    /*'smartpost_hub' => [
         'title' => __('Freight SmartPost Hub', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'description' => __('Only required if using SmartPost.', 'woocommerce-shipping-freight'),
         'desc_tip' => true,
         'default' => '',
         'options' => $smartpost_hubs,
-    ],
+    ],*/
     'offer_rates' => [
         'title' => __('Offer Rates', 'woocommerce-shipping-freight'),
         'type' => 'select',
@@ -213,13 +213,13 @@ return [
         'type' => 'checkbox',
         'default' => 'no',
     ],
-    'freight_number' => [
+    /*'freight_number' => [
         'title' => __('Freight Freight Account Number', 'woocommerce-shipping-freight'),
         'type' => 'text',
         'description' => '',
         'default' => '',
         'placeholder' => __('Defaults to your main account number', 'woocommerce-shipping-freight'),
-    ],
+    ],*/
     'freight_billing_street' => [
         'title' => __('Billing Street Address', 'woocommerce-shipping-freight'),
         'type' => 'text',

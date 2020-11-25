@@ -4,21 +4,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-/**
- * Map freight classes to shipping classes
- */
 class WC_Freight_Mapping
 {
     public $freight_class;
     public $display_freight_class;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
-        $this->classes = include(dirname(__FILE__).'/data/data-freight-classes.php');
-
+        $this->classes = include(__DIR__.'/data/data-freight-classes.php');
         add_filter('woocommerce_get_shipping_classes', [$this, 'get_shipping_classes']);
         add_filter('woocommerce_shipping_classes_columns', [$this, 'add_shipping_class_column']);
         add_action('woocommerce_shipping_classes_column_freight-class', [$this, 'display_freight_class_column']);
@@ -31,6 +24,7 @@ class WC_Freight_Mapping
      * @param  array
      *
      * @return array
+     * @since  2.0.0
      */
     public function get_shipping_classes($classes)
     {
@@ -44,36 +38,34 @@ class WC_Freight_Mapping
     }
 
     /**
-     * Change columns on shipping clases screen.
+     * Change columns on shipping classes screen.
      *
      * @param  array
      *
      * @return array
+     * @since  2.0.0
      */
     public function add_shipping_class_column($columns)
     {
         $columns['freight-class'] = __('Freight Class', 'woocommerce-shipping-freight');
+
         return $columns;
     }
 
     /**
      * Output html for column
+     *
+     * @since  2.0.0
      */
     public function display_freight_class_column()
-    {
-        ?>
+    { ?>
         <div class="view">{{ data.display_freight_class }}</div>
         <div class="edit">
             <select name="freight_class" data-attribute="freight_class" data-value="{{ data.freight_class }}">
-                <option value=""><?php
-                    esc_html_e('Default', 'woocommerce-shipping-freight'); ?></option>
-                <?php
-                foreach ($this->classes as $key => $value) : ?>
-                    <option value="<?php
-                    echo esc_attr($key); ?>"><?php
-                        echo esc_html($value); ?></option>
-                <?php
-                endforeach; ?>
+                <option value=""><?php esc_html_e('Default', 'woocommerce-shipping-freight'); ?></option>
+                <?php foreach ($this->classes as $key => $value): ?>
+                    <option value="<?= esc_attr($key); ?>"><?= esc_html($value); ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
         <?php
@@ -81,17 +73,20 @@ class WC_Freight_Mapping
 
     /**
      * Save class during ajax save event.
+     *
+     * @param  mixed $term_id  Array when adding new class, int when editing.
+     *
+     * @return mixed
+     * @since  2.0.0
      */
     public function save_shipping_class($term_id, $data)
     {
         if (!empty($term_id) && isset($data['freight_class'])) {
-            // $term_id is an array when add new class and its int
-            // when editing the class.
-            if (is_array($term_id)) {
+            /*if (is_array($term_id)) {
                 $term_id = $term_id['term_id'];
-            }
+            }*/
 
-            update_term_meta($term_id, 'freight_class', sanitize_text_field($data['freight_class']));
+            update_term_meta($term_id['term_id'] ?? $term_id, 'freight_class', sanitize_text_field($data['freight_class']));
         }
     }
 }

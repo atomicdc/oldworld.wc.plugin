@@ -6,10 +6,6 @@ if (!class_exists('WC_Abstract_Privacy')) {
 
 class WC_Freight_Privacy extends WC_Abstract_Privacy
 {
-    /**
-     * Constructor
-     *
-     */
     public function __construct()
     {
         parent::__construct(__('Freight', 'woocommerce-shipping-freight'));
@@ -18,6 +14,8 @@ class WC_Freight_Privacy extends WC_Abstract_Privacy
     /**
      * Gets the message of the privacy to display.
      *
+     * @return string
+     * @since  2.0.0
      */
     public function get_privacy_message()
     {

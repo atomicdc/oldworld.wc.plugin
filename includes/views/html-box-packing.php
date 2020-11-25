@@ -1,7 +1,11 @@
 <tr valign="top" id="packing_options">
-    <th scope="row" class="titledesc"><?php
-        _e('Box Sizes', 'woocommerce-shipping-freight'); ?></th>
+
+    <th scope="row" class="titledesc">
+        <?php _e('Box Sizes', 'woocommerce-shipping-freight'); ?>
+    </th>
+
     <td class="forminp">
+
         <style type="text/css">
             .freight_boxes td, .freight_services td {
                 vertical-align: middle;
@@ -35,119 +39,110 @@
                 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAHUlEQVQYV2O8f//+fwY8gJGgAny6QXKETRgEVgAAXxAVsa5Xr3QAAAAASUVORK5CYII=) no-repeat center;
             }
         </style>
+
         <table class="freight_boxes widefat">
             <thead>
-            <tr>
-                <th class="check-column"><input type="checkbox"/></th>
-                <th><?php
-                    _e('Name', 'woocommerce-shipping-freight'); ?></th>
-                <th><?php
-                    _e('Length', 'woocommerce-shipping-freight'); ?></th>
-                <th><?php
-                    _e('Width', 'woocommerce-shipping-freight'); ?></th>
-                <th><?php
-                    _e('Height', 'woocommerce-shipping-freight'); ?></th>
-                <th><?php
-                    _e('Weight of Box', 'woocommerce-shipping-freight'); ?></th>
-                <th><?php
-                    _e('Max Weight', 'woocommerce-shipping-freight'); ?></th>
-                <th><?php
-                    _e('Enabled', 'woocommerce-shipping-freight'); ?></th>
-            </tr>
+                <tr>
+                    <th class="check-column"><input type="checkbox"/></th>
+                    <th><?php _e('Name', 'woocommerce-shipping-freight'); ?></th>
+                    <th><?php _e('Length', 'woocommerce-shipping-freight'); ?></th>
+                    <th><?php _e('Width', 'woocommerce-shipping-freight'); ?></th>
+                    <th><?php _e('Height', 'woocommerce-shipping-freight'); ?></th>
+                    <th><?php _e('Weight of Box', 'woocommerce-shipping-freight'); ?></th>
+                    <th><?php _e('Max Weight', 'woocommerce-shipping-freight'); ?></th>
+                    <th><?php _e('Enabled', 'woocommerce-shipping-freight'); ?></th>
+                </tr>
             </thead>
             <tfoot>
-            <tr>
-                <th colspan="3">
-                    <a href="#" class="button plus insert"><?php
-                        _e('Add Box', 'woocommerce-shipping-freight'); ?></a>
-                    <a href="#" class="button minus remove"><?php
-                        _e('Remove selected box(es)', 'woocommerce-shipping-freight'); ?></a>
-                </th>
-                <th colspan="6">
-                    <small class="description"><?php
-                        _e('Items will be packed into these boxes depending based on item dimensions and volume. Dimensions will be passed to Freight Shipping and used for packing. Items not fitting into boxes will be packed individually.',
-                            'woocommerce-shipping-freight'); ?></small>
-                </th>
-            </tr>
+
+                <tr>
+                    <th colspan="3">
+                        <a href="#" class="button plus insert"><?php _e('Add Box', 'woocommerce-shipping-freight'); ?></a>
+                        <a href="#" class="button minus remove"><?php _e('Remove selected box(es)', 'woocommerce-shipping-freight'); ?></a>
+                    </th>
+
+                    <th colspan="6">
+                        <small class="description">
+                            <?php _e('Items will be packed into these boxes depending based on item dimensions and volume. Dimensions will be passed to Freight Shipping and used for packing. Items not fitting into boxes will be packed individually.', 'woocommerce-shipping-freight'); ?>
+                        </small>
+                    </th>
+                </tr>
+
             </tfoot>
             <tbody id="rates">
-            <?php
-            if ($this->default_boxes) {
-                foreach ($this->default_boxes as $key => $box) { ?>
-                    <tr>
-                        <td class="check-column"></td>
-                        <td><?php
-                            echo $box['name']; ?></td>
-                        <td><input type="text" size="5" readonly value="<?php
-                            echo esc_attr($box['length']); ?>"/>in
-                        </td>
-                        <td><input type="text" size="5" readonly value="<?php
-                            echo esc_attr($box['width']); ?>"/>in
-                        </td>
-                        <td><input type="text" size="5" readonly value="<?php
-                            echo esc_attr($box['height']); ?>"/>in
-                        </td>
-                        <td><input type="text" size="5" readonly value="<?php
-                            echo esc_attr($box['box_weight']); ?>"/>lbs
-                        </td>
-                        <td><input type="text" size="5" readonly value="<?php
-                            echo esc_attr($box['max_weight']); ?>"/>lbs
-                        </td>
-                        <td><input type="checkbox" name="boxes_enabled[<?php
-                            echo $box['id']; ?>]" <?php
-                            checked(!isset($this->boxes[$box['id']]['enabled']) || $this->boxes[$box['id']]['enabled'] == 1,
-                                true); ?> /></td>
-                    </tr>
-                    <?php
-                }
-            }
-            if ($this->boxes) {
-                foreach ($this->boxes as $key => $box) {
-                    if (!is_numeric($key)) {
-                        continue;
-                    } ?>
-                    <tr>
-                        <td class="check-column"><input type="checkbox"/></td>
-                        <td><input type="text" size="10" name="boxes_name[<?php
-                            echo $key; ?>]" value="<?php
-                            echo isset($box['name']) ? esc_attr($box['name']) : ''; ?>"/></td>
-                        <td><input type="text" size="5" name="boxes_length[<?php
-                            echo $key; ?>]" value="<?php
-                            echo esc_attr($box['length']); ?>"/>in
-                        </td>
-                        <td><input type="text" size="5" name="boxes_width[<?php
-                            echo $key; ?>]" value="<?php
-                            echo esc_attr($box['width']); ?>"/>in
-                        </td>
-                        <td><input type="text" size="5" name="boxes_height[<?php
-                            echo $key; ?>]" value="<?php
-                            echo esc_attr($box['height']); ?>"/>in
-                        </td>
-                        <td><input type="text" size="5" name="boxes_box_weight[<?php
-                            echo $key; ?>]" value="<?php
-                            echo esc_attr($box['box_weight']); ?>"/>lbs
-                        </td>
-                        <td><input type="text" size="5" name="boxes_max_weight[<?php
-                            echo $key; ?>]" value="<?php
-                            echo esc_attr($box['max_weight']); ?>"/>lbs
-                        </td>
-                        <td><input type="checkbox" name="boxes_enabled[<?php
-                            echo $key; ?>]" <?php
-                            checked($box['enabled'], true); ?> /></td>
-                    </tr>
-                    <?php
-                }
-            }
-            ?>
+
+                <?php
+                if ($this->default_boxes):
+                    foreach ($this->default_boxes as $key => $box):
+                        $checked = checked(!isset($this->boxes[$box['id']]['enabled']) || $this->boxes[$box['id']]['enabled'] == 1, true); ?>
+
+                        <tr>
+                            <td class="check-column"></td>
+                            <td><?= $box['name']; ?></td>
+                            <td><input type="text" size="5" readonly value="<?= esc_attr($box['length']); ?>"/>in</td>
+                            <td><input type="text" size="5" readonly value="<?= esc_attr($box['width']); ?>"/>in</td>
+                            <td><input type="text" size="5" readonly value="<?= esc_attr($box['height']); ?>"/>in</td>
+                            <td><input type="text" size="5" readonly value="<?= esc_attr($box['box_weight']); ?>"/>lbs</td>
+                            <td><input type="text" size="5" readonly value="<?=esc_attr($box['max_weight']); ?>"/>lbs</td>
+                            <td><input type="checkbox" name="boxes_enabled[<?= $box['id']; ?>]" <?= $checked; ?> /></td>
+                        </tr>
+
+                        <?php
+                    endforeach;
+                endif;
+
+                if ($this->boxes):
+                    foreach ($this->boxes as $key => $box):
+
+                        if (!is_numeric($key)):
+                            continue;
+                        endif;
+                        $checked = checked($box['enabled'], true); ?>
+
+                        <tr>
+                            <td class="check-column"><input type="checkbox"/></td>
+                            <td><input type="text" size="10"
+                                       name="boxes_name[<?= $key; ?>]"
+                                       value="<?= isset($box['name']) ? esc_attr($box['name']) : null; ?>" />
+                            </td>
+                            <td><input type="text" size="5"
+                                       name="boxes_length[<?= $key; ?>]"
+                                       value="<?= esc_attr($box['length']); ?>"/>in
+                            </td>
+                            <td><input type="text" size="5"
+                                       name="boxes_width[<?=$key; ?>]"
+                                       value="<?= esc_attr($box['width']); ?>"/>in
+                            </td>
+                            <td><input type="text" size="5"
+                                       name="boxes_height[<?= $key; ?>]"
+                                       value="<?= esc_attr($box['height']); ?>"/>in
+                            </td>
+                            <td><input type="text" size="5"
+                                       name="boxes_box_weight[<?= $key; ?>]"
+                                       value="<?= esc_attr($box['box_weight']); ?>"/>lbs
+                            </td>
+                            <td><input type="text" size="5"
+                                       name="boxes_max_weight[<?= $key; ?>]"
+                                       value="<?= esc_attr($box['max_weight']); ?>"/>lbs
+                            </td>
+                            <td><input type="checkbox" name="boxes_enabled[<?= $key; ?>]" <?= $checked; ?> /></td>
+                        </tr>
+
+                        <?php
+                    endforeach;
+                endif; ?>
+
             </tbody>
         </table>
+
         <script type="text/javascript">
             jQuery(window).load(function () {
                 jQuery('#woocommerce_freight_packing_method').change(function () {
-                    if (jQuery(this).val() === 'box_packing')
+                    if (jQuery(this).val() === 'box_packing') {
                         jQuery('#packing_options').show();
-                    else
+                    } else {
                         jQuery('#packing_options').hide();
+                    }
                 }).change();
 
                 jQuery('#woocommerce_freight_enabled').change(function () {
@@ -158,7 +153,6 @@
                         var $table = jQuery('#woocommerce_freight_freight_enabled').closest('table');
                         $table.find('tr:not(:first)').hide();
                     }
-
                 }).change();
 
                 jQuery('.freight_boxes .insert').click(function () {

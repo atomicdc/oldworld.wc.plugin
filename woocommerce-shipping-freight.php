@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: WooCommerce Freight Shipping
  * Plugin URI: https://atomicdc.com
@@ -11,8 +10,8 @@
  * WC tested up to: 3.6
  * Tested up to: 5.0
  * Copyright: 2020 Atomic Design & Consulting
- *
  */
+
 if (!function_exists('woothemes_queue_update')) {
     require_once('woo-includes/woo-functions.php');
 }
@@ -22,18 +21,24 @@ define('WC_SHIPPING_FREIGHT_VERSION', '2.0.0');
 class WC_Shipping_Freight_Init
 {
     /**
-     * Plugin's version.
+     * Plugin version
      *
-     * @since 2.0.0
      * @var string
+     * @since 2.0.0
      */
     public $version;
 
-    /** @var object Class Instance */
+    /**
+     * @var   object Class Instance
+     * @since 2.0.0
+     */
     private static $instance;
 
     /**
      * Get the class instance
+     *
+     * @return object $this
+     * @since  2.0.0
      */
     public static function get_instance()
     {
@@ -47,15 +52,13 @@ class WC_Shipping_Freight_Init
     {
         $this->version = WC_SHIPPING_FREIGHT_VERSION;
 
-        if (class_exists('WC_Shipping_Method') && class_exists('SoapClient')) {
+        if (class_exists('WC_Shipping_Method') && class_exists('SoapClient') && version_compare(WC_VERSION, '2.6.0', '>')) {
             add_action('admin_init', [$this, 'maybe_install'], 5);
             add_action('init', [$this, 'load_textdomain']);
             add_filter('plugin_action_links_'.plugin_basename(__FILE__), [$this, 'plugin_links']);
             add_action('woocommerce_shipping_init', [$this, 'includes']);
             add_filter('woocommerce_shipping_methods', [$this, 'add_method']);
             add_action('admin_notices', [$this, 'environment_check']);
-            /*add_action('admin_notices', [$this, 'upgrade_notice']);*/
-            /*add_action('wp_ajax_freight_dismiss_upgrade_notice', [$this, 'dismiss_upgrade_notice']);*/
 
             $freight_settings = get_option('woocommerce_freight_settings', []);
 
@@ -78,10 +81,6 @@ class WC_Shipping_Freight_Init
      */
     public function environment_check()
     {
-        if (version_compare(WC_VERSION, '2.6.0', '<')) {
-            return;
-        }
-
         if (get_woocommerce_currency() !== 'USD' || WC()->countries->get_base_country() !== 'US') {
             echo '<div class="error">
 				<p>'.__('Freight Shipping requires that the WooCommerce currency is set to US Dollars and that the base country/region is set to United States.',
@@ -98,12 +97,7 @@ class WC_Shipping_Freight_Init
     public function includes()
     {
         include_once(__DIR__.'/includes/class-wc-freight-privacy.php');
-
-        if (version_compare(WC_VERSION, '2.6.0', '<')) {
-            include_once(__DIR__.'/includes/class-wc-shipping-freight-deprecated.php');
-        } else {
-            include_once(__DIR__.'/includes/class-wc-shipping-freight.php');
-        }
+        include_once(__DIR__.'/includes/class-wc-shipping-freight.php');
     }
 
     /**
@@ -116,11 +110,7 @@ class WC_Shipping_Freight_Init
      */
     public function add_method($methods)
     {
-        if (version_compare(WC_VERSION, '2.6.0', '<')) {
-            $methods[] = 'WC_Shipping_Freight';
-        } else {
-            $methods['freight'] = 'WC_Shipping_Freight';
-        }
+        $methods['freight'] = 'WC_Shipping_Freight';
 
         return $methods;
     }
@@ -166,11 +156,17 @@ class WC_Shipping_Freight_Init
     public function wc_deactivated()
     {
         if (!class_exists('XMLWriter')) {
-            echo '<div class="error"><p>'.__('Your server does not provide XML support (XMLWriter Library) which is required functionality for communicating with the pricing API. You will need to reach out to your web hosting provider to get information on how to enable this functionality on your server.', 'woocommerce-shipping-freight').'</p></div>';
+            echo '<div class="error"><p>'.__('Your server does not provide XML support (XMLWriter Library) which is required functionality for communicating with the pricing API. You will need to reach out to your web hosting provider to get information on how to enable this functionality on your server.',
+                    'woocommerce-shipping-freight').'</p></div>';
         }
 
         if (!class_exists('WC_Shipping_Method')) {
             echo '<div class="error"><p>'.sprintf(__('Freight Shipping requires %s to be installed and active.',
+                    'woocommerce-shipping-freight'), 'WooCommerce').'</p></div>';
+        }
+
+        if (version_compare(WC_VERSION, '2.6.0', '<')) {
+            echo '<div class="error"><p>'.sprintf(__('Freight Shipping Requires WooCommerce version of 2.6.0 or later.',
                     'woocommerce-shipping-freight'), 'WooCommerce').'</p></div>';
         }
     }
@@ -209,7 +205,8 @@ class WC_Shipping_Freight_Init
             unset($freight_settings['countries']);
 
             if (!$this->is_zone_has_freight(0)) {
-                $wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->prefix}woocommerce_shipping_zone_methods ( zone_id, method_id, method_order, is_enabled ) VALUES ( %d, %s, %d, %d )", 0, 'freight', 1, 1));
+                $wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->prefix}woocommerce_shipping_zone_methods ( zone_id, method_id, method_order, is_enabled ) VALUES ( %d, %s, %d, %d )",
+                    0, 'freight', 1, 1));
 
                 $instance = $wpdb->insert_id;
                 add_option('woocommerce_freight_'.$instance.'_settings', $freight_settings);
@@ -236,21 +233,23 @@ class WC_Shipping_Freight_Init
         $zones_admin_url = add_query_arg($query_args, get_admin_url().'admin.php');
         ?>
         <div class="notice notice-success is-dismissible wc-freight-notice">
-            <p><?= sprintf(__('Freight Shipping supports shipping zones. The zone settings were added to a new Freight Shipping method on the "Rest of the World" Zone. See the zones %1$shere%2$s ', 'woocommerce-shipping-freight'), '<a href="'.$zones_admin_url.'">', '</a>'); ?></p>
+            <p>
+                <?= sprintf(__('Freight Shipping supports shipping zones. The zone settings were added to a new Freight Shipping method on the "Rest of the World" Zone. See the zones %1$shere%2$s ', 'woocommerce-shipping-freight'), '<a href="'.$zones_admin_url.'">', '</a>'); ?>
+            </p>
         </div>
 
         <script type="application/javascript">
             jQuery('.notice.wc-freight-notice').on('click', '.notice-dismiss', function () {
                 wp.ajax.post('freight_dismiss_upgrade_notice');
             });
-        </script>
-        <?php
+        </script><?php
     }
 
     /**
      * Turn off upgrade notice
      *
-     * @since 2.0.0
+     * @return bool
+     * @since  2.0.0
      */
     public function dismiss_upgrade_notice()
     {
@@ -269,7 +268,8 @@ class WC_Shipping_Freight_Init
     {
         global $wpdb;
 
-        return (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(instance_id) FROM {$wpdb->prefix}woocommerce_shipping_zone_methods WHERE method_id = 'freight' AND zone_id = %d", $zone_id)) > 0;
+        return (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(instance_id) FROM {$wpdb->prefix}woocommerce_shipping_zone_methods WHERE method_id = 'freight' AND zone_id = %d",
+                $zone_id)) > 0;
     }
 }
 

@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * WC_Shipping_Freight class.
+ * Shipping Freight Core
  *
  * @extends WC_Shipping_Method
  */
@@ -15,34 +15,28 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     private $found_rates;
     private $services;
 
-    /**
-     * Constructor
-     */
     public function __construct($instance_id = 0)
     {
         $this->id = 'freight';
         $this->instance_id = absint($instance_id);
         $this->method_title = __('Freight Shipping', 'woocommerce-shipping-freight');
-        $this->method_description = __('The Freight Shipping extension obtains rates dynamically from the Bedrock API during cart/checkout.',
+        $this->method_description = __('The Freight Shipping extension obtains rates dynamically via API during cart/checkout.',
             'woocommerce-shipping-freight');
-        $this->rateservice_version = 16;
-        $this->addressvalidationservice_version = 2;
+        /*$this->rateservice_version = 16;*/
+        /*$this->addressvalidationservice_version = 2;*/
         $this->default_boxes = include(dirname(__FILE__).'/data/data-box-sizes.php');
-        $this->services = include(dirname(__FILE__).'/data/data-service-codes.php');
-        $this->supports = [
-            'shipping-zones',
-            'instance-settings',
-            'settings',
-        ];
+        /*$this->services = include(dirname(__FILE__).'/data/data-service-codes.php');*/
+        $this->supports = ['shipping-zones', 'instance-settings', 'settings',];
         $this->init();
     }
 
     /**
-     * is_available function.
+     * See if destination qualifies for freight shipping
      *
      * @param  array  $package
      *
-     * @return bool
+     * @return  bool
+     * @since   2.0.0
      */
     public function is_available($package)
     {
@@ -54,35 +48,36 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     }
 
     /**
+     * Properties setter
      *
-     * @return void
+     * @return  void
      * @since   2.0.0
      */
     private function set_settings()
     {
-        // Define user set variables
         $this->title = $this->get_option('title', $this->method_title);
         $this->origin = apply_filters('woocommerce_freight_origin_postal_code',
             str_replace(' ', '', strtoupper($this->get_option('origin'))));
-        $this->origin_country = apply_filters('woocommerce_freight_origin_country_code', WC()->countries->get_base_country());
-        $this->account_number = $this->get_option('account_number');
-        $this->meter_number = $this->get_option('meter_number');
-        $this->smartpost_hub = $this->get_option('smartpost_hub');
+        $this->origin_country = apply_filters('woocommerce_freight_origin_country_code',
+            WC()->countries->get_base_country());
+        /*$this->account_number = $this->get_option('account_number');*/
+        /*$this->meter_number = $this->get_option('meter_number');*/
+        /*$this->smartpost_hub = $this->get_option('smartpost_hub');*/
         $this->api_key = $this->get_option('api_key');
         $this->api_pass = $this->get_option('api_pass');
-        $this->production = (($bool = $this->get_option('production')) && $bool === 'yes');
+        /*$this->production = (($bool = $this->get_option('production')) && $bool === 'yes');*/
         $this->debug = (($bool = $this->get_option('debug')) && $bool === 'yes');
-        $this->insure_contents = (($bool = $this->get_option('insure_contents')) && $bool === 'yes');
+        /*$this->insure_contents = (($bool = $this->get_option('insure_contents')) && $bool === 'yes');*/
         $this->request_type = $this->get_option('request_type', 'LIST');
         $this->packing_method = $this->get_option('packing_method', 'per_item');
         $this->boxes = $this->get_option('boxes', []);
-        $this->custom_services = $this->get_option('services', []);
+        /*$this->custom_services = $this->get_option('services', []);*/
         $this->offer_rates = $this->get_option('offer_rates', 'all');
         $this->residential = (($bool = $this->get_option('residential')) && $bool === 'yes');
         $this->freight_enabled = (($bool = $this->get_option('freight_enabled')) && $bool === 'yes');
         $this->freight_one_rate = (($bool = $this->get_option('freight_one_rate')) && $bool === 'yes');
-        $this->direct_distribution = (($bool = $this->get_option('direct_distribution')) && $bool === 'yes');
-        $this->freight_one_rate_package_ids = [
+        /*$this->direct_distribution = (($bool = $this->get_option('direct_distribution')) && $bool === 'yes');*/
+        /*$this->freight_one_rate_package_ids = [
             'FREIGHT_SMALL_BOX',
             'FREIGHT_MEDIUM_BOX',
             'FREIGHT_LARGE_BOX',
@@ -90,17 +85,21 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             'FREIGHT_PAK',
             'FREIGHT_ENVELOPE',
             'FREIGHT_TUBE',
+        ];*/
+        $this->freight_one_rate_package_ids = [
+            'FREIGHT_CRATE', //todo: how does the api use this?
         ];
 
         if ($this->freight_enabled) {
             $this->freight_class = str_replace(['CLASS_', '.'], ['', '_'], $this->get_option('freight_class'));
-            $this->freight_number = $this->get_option('freight_number', $this->account_number);
+            /*$this->freight_number = $this->get_option('freight_number', $this->account_number);*/
             $this->freight_billing_street = $this->get_option('freight_billing_street');
             $this->freight_billing_street_2 = $this->get_option('freight_billing_street_2');
             $this->freight_billing_city = $this->get_option('freight_billing_city');
             $this->freight_billing_state = $this->get_option('freight_billing_state');
             $this->freight_billing_postcode = $this->get_option('freight_billing_postcode');
             $this->freight_billing_country = $this->get_option('freight_billing_country');
+
             $this->freight_shipper_street = $this->get_option('freight_shipper_street');
             $this->freight_shipper_street_2 = $this->get_option('freight_shipper_street_2');
             $this->freight_shipper_city = $this->get_option('freight_shipper_city');
@@ -109,28 +108,21 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             $this->freight_shipper_country = $this->get_option('freight_shipper_country');
             $this->freight_shipper_residential = (($bool = $this->get_option('freight_shipper_residential')) && $bool === 'yes');
         }
-
-        // Insure contents requires matching currency to country
-        switch (WC()->countries->get_base_country()) {
-            case 'US' :
+        /*switch (WC()->countries->get_base_country()) {
+            case 'US':
                 if ('USD' !== get_woocommerce_currency()) {
                     $this->insure_contents = false;
                 }
                 break;
-            case 'CA' :
-                if ('CAD' !== get_woocommerce_currency()) {
-                    $this->insure_contents = false;
-                }
-                break;
-        }
+        }*/
     }
 
     /**
-     * init function.
+     *
+     * @since 2.0.0
      */
     private function init()
     {
-        // Load the settings.
         $this->init_form_fields();
         $this->set_settings();
 
@@ -141,24 +133,20 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Process settings on save
      *
-     * @access  public
-     * @return void
-     * @version 3.4.0
-     * @since   3.4.0
+     * @return  void
+     * @since   2.0.0
      */
     public function process_admin_options()
     {
         parent::process_admin_options();
-
         $this->set_settings();
     }
 
     /**
      * Load admin scripts
      *
-     * @return void
-     * @version 3.4.0
-     * @since   3.4.0
+     * @return  void
+     * @since   2.0.0
      */
     public function load_admin_scripts()
     {
@@ -168,8 +156,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Output a message or error
      *
-     * @param  string  $message
-     * @param  string  $type
+     * @param   string  $message
+     * @param   string  $type
+     * @return  void
+     * @since   2.0.0
      */
     public function debug($message, $type = 'notice')
     {
@@ -179,13 +169,13 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     }
 
     /**
-     * init_form_fields function.
+     *
+     * @since 2.0.0
      */
     public function init_form_fields()
     {
-        $this->instance_form_fields = include(dirname(__FILE__).'/data/data-settings.php');
-
-        $freight_classes = include(dirname(__FILE__).'/data/data-freight-classes.php');
+        $this->instance_form_fields = include(__DIR__.'/data/data-settings.php');
+        $freight_classes = include(__DIR__.'/data/data-freight-classes.php');
 
         $this->form_fields = [
             'api' => [
@@ -194,20 +184,20 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'description' => __('Description should go here',
                     'woocommerce-shipping-freight'),
             ],
-            'account_number' => [
+            /*'account_number' => [
                 'title' => __('Freight Shipping Account Number', 'woocommerce-shipping-freight'),
                 'type' => 'text',
                 'description' => '',
                 'default' => '',
-            ],
-            'meter_number' => [
+            ],*/
+            /*'meter_number' => [
                 'title' => __('Freight Meter Number', 'woocommerce-shipping-freight'),
                 'type' => 'text',
                 'description' => '',
                 'default' => '',
-            ],
+            ],*/
             'api_key' => [
-                'title' => __('Web Services Key', 'woocommerce-shipping-freight'),
+                'title' => __('Web Services Username', 'woocommerce-shipping-freight'),
                 'type' => 'text',
                 'description' => '',
                 'default' => '',
@@ -224,7 +214,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                     'autocomplete' => 'off',
                 ],
             ],
-            'production' => [
+            /*'production' => [
                 'title' => __('Production Key', 'woocommerce-shipping-freight'),
                 'label' => __('This is a production key', 'woocommerce-shipping-freight'),
                 'type' => 'checkbox',
@@ -232,11 +222,11 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'desc_tip' => true,
                 'description' => __('If this is a production API key and not a developer key, check this box.',
                     'woocommerce-shipping-freight'),
-            ],
+            ],*/
             'freight' => [
                 'title' => __('Freight Shipping', 'woocommerce-shipping-freight'),
                 'type' => 'title',
-                'description' => __('Note: These rates require the customers CITY so won\'t display until checkout.',
+                'description' => __('Note: These rates require the customers ZIP.',
                     'woocommerce-shipping-freight'),
             ],
             'freight_enabled' => [
@@ -245,13 +235,13 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'type' => 'checkbox',
                 'default' => 'no',
             ],
-            'freight_number' => [
+            /*'freight_number' => [
                 'title' => __('Bedrock Freight Account Number', 'woocommerce-shipping-freight'),
                 'type' => 'text',
                 'description' => '',
                 'default' => '',
                 'placeholder' => __('Defaults to your main account number', 'woocommerce-shipping-freight'),
-            ],
+            ],*/
             'freight_billing_street' => [
                 'title' => __('Billing Street Address', 'woocommerce-shipping-freight'),
                 'type' => 'text',
@@ -320,8 +310,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             ],
             'freight_class' => [
                 'title' => __('Default Freight Class', 'woocommerce-shipping-freight'),
-                'description' => sprintf(__('This is the default freight class for shipments. This can be overridden using <a href="%s">shipping classes</a>',
-                    'woocommerce-shipping-freight'), $shipping_class_link),
+                'description' => sprintf(__('This is the default freight class for shipments. This can be overridden using <a href="%s">shipping classes</a>', 'woocommerce-shipping-freight'), $shipping_class_link),
                 'type' => 'select',
                 'default' => '50',
                 'options' => $freight_classes,
@@ -339,7 +328,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     }
 
     /**
-     * generate_services_html function.
+     *
+     *
+     * @return  string
+     * @since   2.0.0
      */
     public function generate_services_html()
     {
@@ -349,7 +341,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     }
 
     /**
-     * generate_box_packing_html function.
+     *
+     *
+     * @return  string
+     * @since   2.0.0
      */
     public function generate_box_packing_html()
     {
@@ -359,9 +354,11 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     }
 
     /**
-     * validate_box_packing_field function.
      *
-     * @param  mixed  $key
+     *
+     * @param   mixed   $key
+     * @return  array
+     * @since   2.0.0
      */
     public function validate_box_packing_field($key)
     {
@@ -375,7 +372,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         $boxes = [];
 
-        if (!empty($boxes_length) && sizeof($boxes_length) > 0) {
+        if (!empty($boxes_length) && count($boxes_length) > 0) {
             for ($i = 0; $i <= max(array_keys($boxes_length)); $i++) {
                 if (!isset($boxes_length[$i])) {
                     continue;
@@ -384,16 +381,17 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 if ($boxes_length[$i] && $boxes_width[$i] && $boxes_height[$i]) {
                     $boxes[] = [
                         'name' => wc_clean($boxes_name[$i]),
-                        'length' => floatval($boxes_length[$i]),
-                        'width' => floatval($boxes_width[$i]),
-                        'height' => floatval($boxes_height[$i]),
-                        'box_weight' => floatval($boxes_box_weight[$i]),
-                        'max_weight' => floatval($boxes_max_weight[$i]),
+                        'length' => (float) $boxes_length[$i],
+                        'width' => (float) $boxes_width[$i],
+                        'height' => (float) $boxes_height[$i],
+                        'box_weight' => (float) $boxes_box_weight[$i],
+                        'max_weight' => (float) $boxes_max_weight[$i],
                         'enabled' => isset($boxes_enabled[$i]) ? true : false,
                     ];
                 }
             }
         }
+
         foreach ($this->default_boxes as $box) {
             $boxes[$box['id']] = [
                 'enabled' => isset($boxes_enabled[$box['id']]) ? true : false,
@@ -403,9 +401,11 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     }
 
     /**
-     * validate_services_field function.
      *
-     * @param  mixed  $key
+     *
+     * @param   mixed  $key
+     * @return  array
+     * @since   2.0.0
      */
     public function validate_services_field($key)
     {
@@ -421,27 +421,24 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'adjustment_percent' => str_replace('%', '', wc_clean($settings['adjustment_percent'])),
             ];
         }
-
         return $services;
     }
 
     /**
-     * Get packages.
+     * Get packages. Divide the WC package into packages/parcels
      *
-     * Divide the WC package into packages/parcels
-     *
-     * @param  array  $package  Package to ship.
-     *
-     * @return array Package to ship.
+     * @param   array   $package
+     * @return  array
+     * @since   2.0.0
      */
     public function get_freight_packages($package)
     {
         switch ($this->packing_method) {
-            case 'box_packing' :
+            case 'box_packing':
                 return $this->box_shipping($package);
                 break;
-            case 'per_item' :
-            default :
+            case 'per_item':
+            default:
                 return $this->per_item_shipping($package);
                 break;
         }
@@ -450,46 +447,44 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Get the freight class
      *
-     * @param  int  $shipping_class_id
-     * @return string
+     * @param   int      $shipping_class_id
+     * @return  string
+     * @since   2.0.0
      */
     public function get_freight_class($shipping_class_id)
     {
-        $class = version_compare(WC_VERSION, '3.6', 'ge') ? get_term_meta($shipping_class_id, 'freight_class',
-            true) : get_woocommerce_term_meta($shipping_class_id, 'freight_class', true);
-        return $class ? $class : '';
+        $class = version_compare(WC_VERSION, '3.6', 'ge')
+            ? get_term_meta($shipping_class_id, 'freight_class', true)
+            : get_woocommerce_term_meta($shipping_class_id, 'freight_class', true);
+        return $class ?? null;
     }
 
     /**
      * Pack items individually.
      *
-     * @access private
-     *
-     * @param  mixed  $package  Package to ship.
-     *
-     * @return array
+     * @param   mixed  $package  Package to ship.
+     * @return  mixed
+     * @since   2.0.0
      */
     private function per_item_shipping($package)
     {
         $to_ship = [];
         $group_id = 1;
 
-        // Get weight of order.
         foreach ($package['contents'] as $item_id => $values) {
             if (!$values['data']->needs_shipping()) {
-                $this->debug(sprintf(__('Product # is virtual. Skipping.', 'woocommerce-shipping-freight'), $item_id),
-                    'notice');
+                $this->debug(sprintf(__('Product # is virtual. Skipping.', 'woocommerce-shipping-freight'),
+                    $item_id), 'notice');
                 continue;
             }
 
             if (!$values['data']->get_weight()) {
-                $this->debug(sprintf(__('Product # is missing weight. Aborting.', 'woocommerce-shipping-freight'), $item_id),
-                    'error');
+                $this->debug(sprintf(__('Product # is missing weight. Aborting.', 'woocommerce-shipping-freight'),
+                    $item_id), 'error');
                 return;
             }
 
             $group = [];
-
             $group = [
                 'GroupNumber' => $group_id,
                 'GroupPackageCount' => $values['quantity'],
@@ -502,7 +497,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
             if ($values['data']->get_length() && $values['data']->get_height() && $values['data']->get_width()) {
                 $dimensions = [$values['data']->get_length(), $values['data']->get_width(), $values['data']->get_height()];
-
                 sort($dimensions);
 
                 $group['Dimensions'] = [
@@ -519,21 +513,17 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             ];
 
             $to_ship[] = $group;
-
             $group_id++;
         }
-
         return $to_ship;
     }
 
     /**
      * Pack into boxes with weights and dimensions.
      *
-     * @access private
-     *
-     * @param  mixed  $package  Package to ship.
-     *
-     * @return array
+     * @param   mixed  $package  Package to ship.
+     * @return  array
+     * @since   2.0.0
      */
     private function box_shipping($package)
     {
@@ -543,13 +533,13 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         $boxpack = new WC_Boxpack(['prefer_packets' => true]);
 
-        // Merge default boxes.
+        // Merge default boxes
         foreach ($this->default_boxes as $key => $box) {
             $box['enabled'] = isset($this->boxes[$box['id']]['enabled']) ? $this->boxes[$box['id']]['enabled'] : true;
             $this->boxes[] = $box;
         }
 
-        // Define boxes.
+        // Define boxes
         foreach ($this->boxes as $key => $box) {
             if (!is_numeric($key)) {
                 continue;
@@ -564,7 +554,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             }
 
             $newbox = $boxpack->add_box($box['length'], $box['width'], $box['height'], $box['box_weight']);
-
             $newbox->set_max_weight($box['max_weight']);
 
             if (isset($box['id'])) {
@@ -593,8 +582,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                         wc_get_dimension($dimensions[1], 'in'),
                         wc_get_dimension($dimensions[0], 'in'),
                         wc_get_weight($values['data']->get_weight(), 'lbs'),
-                        $values['data']->get_price(),
-                        [
+
+                        $values['data']->get_price(), [
                             'data' => $values['data'],
                         ]
                     );
@@ -613,12 +602,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $group_id = 1;
 
         foreach ($packages as $package) {
-            $this->debug(
-                ($package->unpacked ? 'Unpacked Item ' : 'Packed ').$package->id.' - '.$package->length.'x'.$package->width.'x'.$package->height
-            );
+            $this->debug(($package->unpacked ? 'Unpacked Item ' : 'Packed ').$package->id.' - '.$package->length.'x'.$package->width.'x'.$package->height);
 
             $dimensions = [$package->length, $package->width, $package->height];
-
             sort($dimensions);
 
             $group = [
@@ -634,10 +620,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                     'Height' => max(1, round($dimensions[0], 2)),
                     'Units' => 'IN',
                 ],
-                'InsuredValue' => [
+                /*'InsuredValue' => [
                     'Amount' => round($package->value),
                     'Currency' => get_woocommerce_currency(),
-                ],
+                ],*/
                 'packed_products' => [],
                 'package_id' => $package->id,
             ];
@@ -662,24 +648,20 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                         }
                     }
                 }
-
-                $group['freight_class'] = $highest_freight_class ? $highest_freight_class : '';
+                $group['freight_class'] = $highest_freight_class ?? null;
             }
-
             $to_ship[] = $group;
-
             $group_id++;
         }
-
         return $to_ship;
     }
 
     /**
      * See if address is residential
      */
-    public function residential_address_validation($package)
+    /*public function residential_address_validation($package)
     {
-        $residential = $this->residential;
+       $residential = $this->residential;
 
         // Address Validation API only available for production
         if ($this->production) {
@@ -743,8 +725,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
                     if ($addressResult->ProposedAddressDetails->ResidentialStatus == 'BUSINESS') {
                         $residential = false;
-                    } else if ($addressResult->ProposedAddressDetails->ResidentialStatus == 'RESIDENTIAL') {
-                        $residential = true;
+                    } else {
+                        if ($addressResult->ProposedAddressDetails->ResidentialStatus == 'RESIDENTIAL') {
+                            $residential = true;
+                        }
                     }
                 }
             } catch (Exception $e) {
@@ -756,7 +740,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         if ($this->residential == false) {
             $this->debug(__('Business Address', 'woocommerce-shipping-freight'));
         }
-    }
+    }*/
 
     /**
      * get_freight_api_request function.
@@ -773,27 +757,31 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $request = [];
 
         // Prepare Shipping Request for Freight.
-        $request['WebAuthenticationDetail'] = [
+        /*$request['WebAuthenticationDetail'] = [
             'UserCredential' => [
                 'Key' => $this->api_key,
                 'Password' => $this->api_pass,
             ],
-        ];
-        $request['ClientDetail'] = [
+        ];*/
+
+        /*$request['ClientDetail'] = [
             'AccountNumber' => $this->account_number,
             'MeterNumber' => $this->meter_number,
-        ];
-        $request['TransactionDetail'] = [
+        ];*/
+
+        /*$request['TransactionDetail'] = [
             'CustomerTransactionId' => ' *** WooCommerce Rate Request ***',
-        ];
-        $request['Version'] = [
+        ];*/
+
+        /*$request['Version'] = [
             'ServiceId' => 'crs',
             'Major' => $this->rateservice_version,
             'Intermediate' => '0',
             'Minor' => '0',
-        ];
+        ];*/
+
         //$request['ReturnTransitAndCommit'] = false;
-        $request['RequestedShipment']['PreferredCurrency'] = get_woocommerce_currency();
+        /*$request['RequestedShipment']['PreferredCurrency'] = get_woocommerce_currency();
         $request['RequestedShipment']['DropoffType'] = 'REGULAR_PICKUP';
         $request['RequestedShipment']['ShipTimestamp'] = date('c', strtotime('+1 Weekday'));
         $request['RequestedShipment']['PackagingType'] = 'YOUR_PACKAGING';
@@ -802,8 +790,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'PostalCode' => $this->origin,
                 'CountryCode' => $this->origin_country,
             ],
-        ];
-        $request['RequestedShipment']['ShippingChargesPayment'] = [
+        ];*/
+
+        /*$request['RequestedShipment']['ShippingChargesPayment'] = [
             'PaymentType' => 'SENDER',
             'Payor' => [
                 'ResponsibleParty' => [
@@ -811,15 +800,16 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                     'CountryCode' => WC()->countries->get_base_country(),
                 ],
             ],
-        ];
-        $request['RequestedShipment']['RateRequestTypes'] = 'LIST' === $this->request_type ? 'LIST' : 'NONE';
+        ];*/
+
+        /*$request['RequestedShipment']['RateRequestTypes'] = 'LIST' === $this->request_type ? 'LIST' : 'NONE';*/
 
         // Special case for Virgin Islands.
-        if ('VI' === $package['destination']['state']) {
+        /*if ('VI' === $package['destination']['state']) {
             $package['destination']['country'] = 'VI';
-        }
+        }*/
 
-        $request['RequestedShipment']['Recipient'] = [
+        /*$request['RequestedShipment']['Recipient'] = [
             'Address' => [
                 'StreetLines' => [$package['destination']['address'], $package['destination']['address_2']],
                 'Residential' => $this->residential,
@@ -828,19 +818,17 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'StateOrProvinceCode' => strlen($package['destination']['state']) == 2 ? strtoupper($package['destination']['state']) : '',
                 'CountryCode' => $package['destination']['country'],
             ],
-        ];
+        ];*/
 
-        return apply_filters('woocommerce_freight_api_request', $request);
+        /*return apply_filters('woocommerce_freight_api_request', $request);*/
     }
 
     /**
-     * get_freight_requests function.
      *
-     * @access private
      *
-     * @param  $freight_packages Array of packages to ship
-     * @param  $package        array the package passed from WooCommerce
-     * @param  $request_type   Used if making a certain type of request i.e. freight, smartpost
+     * @param  $freight_packages array  Packages to ship
+     * @param  $package          array  The package passed from WooCommerce
+     * @param  $request_type     string
      *
      * @return array
      */
@@ -880,7 +868,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                         }
                     } else {
                         // Work out the commodities for CA shipments
-                        if ($parcel_request['packed_products']) {
+                        /*if ($parcel_request['packed_products']) {
                             foreach ($parcel_request['packed_products'] as $product) {
                                 if (isset($commodities[$product->get_id()])) {
                                     $commodities[$product->get_id()]['Quantity']++;
@@ -908,18 +896,20 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                                     ],
                                 ];
                             }
-                        }
+                        }*/
 
-                        if (!empty($parcel_request['package_id'])) {
+                        /*if (!empty($parcel_request['package_id'])) {
                             // Is this valid for a ONE rate? Smart post does not support it
                             if ($this->freight_one_rate && '' === $request_type && in_array($parcel_request['package_id'],
                                     $this->freight_one_rate_package_ids) && 'US' === $package['destination']['country'] && 'US' === $this->origin_country) {
                                 $request['RequestedShipment']['PackagingType'] = $parcel_request['package_id'];
                                 $request['RequestedShipment']['SpecialServicesRequested']['SpecialServiceTypes'] = 'FREIGHT_ONE_RATE';
-                            } else if (in_array($parcel_request['package_id'], wp_list_pluck($this->default_boxes, 'id'))) {
-                                $request['RequestedShipment']['PackagingType'] = $parcel_request['package_id'];
+                            } else {
+                                if (in_array($parcel_request['package_id'], wp_list_pluck($this->default_boxes, 'id'))) {
+                                    $request['RequestedShipment']['PackagingType'] = $parcel_request['package_id'];
+                                }
                             }
-                        }
+                        }*/
                     }
 
                     // Remove temp elements
@@ -927,10 +917,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                     unset($parcel_request['packed_products']);
                     unset($parcel_request['package_id']);
 
-                    if (!$this->insure_contents || 'smartpost' === $request_type || in_array($request['RequestedShipment']['PackagingType'],
+                    /*if (!$this->insure_contents || 'smartpost' === $request_type || in_array($request['RequestedShipment']['PackagingType'],
                             ['FREIGHT_ENVELOPE', 'FREIGHT_PAK'])) {
                         unset($parcel_request['InsuredValue']);
-                    }
+                    }*/
 
                     $parcel_request = array_merge(['SequenceNumber' => $key + 1], $parcel_request);
                     $request['RequestedShipment']['RequestedPackageLineItems'][] = $parcel_request;
@@ -940,8 +930,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 $request['RequestedShipment']['PackageCount'] = $total_packages;
 
                 // Smart post
-                if ('smartpost' === $request_type) {
-                    $request['RequestedShipment']['SmartPostDetail'] = [
+                /*if ('smartpost' === $request_type) {
+                    /*$request['RequestedShipment']['SmartPostDetail'] = [
                         'Indicia' => 'PARCEL_SELECT',
                         'HubId' => $this->smartpost_hub,
                         'AncillaryEndorsement' => 'ADDRESS_CORRECTION',
@@ -953,13 +943,15 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                     if ($this->insure_contents && round($total_value) > 100) {
                         return false;
                     }
-                } else if ($this->insure_contents && !in_array($request['RequestedShipment']['PackagingType'],
-                        ['FREIGHT_ENVELOPE', 'FREIGHT_PAK'])) {
-                    $request['RequestedShipment']['TotalInsuredValue'] = [
-                        'Amount' => round($total_value),
-                        'Currency' => get_woocommerce_currency(),
-                    ];
-                }
+                } else {
+                    if ($this->insure_contents && !in_array($request['RequestedShipment']['PackagingType'],
+                            ['FREIGHT_ENVELOPE', 'FREIGHT_PAK'])) {
+                        $request['RequestedShipment']['TotalInsuredValue'] = [
+                            'Amount' => round($total_value),
+                            'Currency' => get_woocommerce_currency(),
+                        ];
+                    }
+                }*/
 
                 if ('freight' === $request_type) {
                     $request['RequestedShipment']['Shipper'] = [
@@ -1014,7 +1006,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                             ],
                         ],
                     ];
-                } else {
+                } /*else {
                     // Canada broker fees
                     if (($package['destination']['country'] == 'CA' || $package['destination']['country'] == 'US') && WC()->countries->get_base_country() !== $package['destination']['country']) {
                         $request['RequestedShipment']['CustomsClearanceDetail']['DutiesPayment'] = [
@@ -1028,24 +1020,23 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                         ];
                         $request['RequestedShipment']['CustomsClearanceDetail']['Commodities'] = array_values($commodities);
                     }
-                }
-
+                }*/
                 // Add request
                 $requests[] = $request;
             }
         }
-
         return $requests;
     }
 
     /**
      * Get ground rates if the first request was using Freight packaging and which does not return ground rates.
      *
-     * @param  array  $requests
+     * @param   array  $requests
      *
-     * @return array
+     * @return  array
+     * @since   2.0.0
      */
-    protected function get_ground_requests($requests)
+    /*protected function get_ground_requests($requests)
     {
         $ground_requests = [];
         foreach ($requests as $request) {
@@ -1058,7 +1049,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         }
 
         return $ground_requests;
-    }
+    }*/
 
     /**
      * Calculate shipping cost.
@@ -1080,7 +1071,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             'woocommerce-shipping-freight'));
 
         // See if address is residential.
-        $this->residential_address_validation($package);
+        /*$this->residential_address_validation($package);*/
 
         // Get requests.
         $freight_packages = $this->get_freight_packages($package);
@@ -1090,52 +1081,49 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             $this->run_package_request($freight_requests);
 
             // Second request to get ground prices if necessary.
-            if (!empty($this->custom_services['FREIGHT_GROUND']['enabled']) && !$this->is_shipping_internationally()) {
+            /*if (!empty($this->custom_services['FREIGHT_GROUND']['enabled']) && !$this->is_shipping_internationally()) {
                 $freight_ground_requests = $this->get_ground_requests($freight_requests);
                 if ($freight_ground_requests) {
                     $this->run_package_request($freight_ground_requests);
                 }
-            }
+            }*/
         }
 
-        if (!empty($this->custom_services['SMART_POST']['enabled']) && !empty($this->smartpost_hub) && $package['destination']['country'] == 'US' && ($smartpost_requests = $this->get_freight_requests($freight_packages,
+        /*if (!empty($this->custom_services['SMART_POST']['enabled']) && !empty($this->smartpost_hub) && $package['destination']['country'] == 'US' && ($smartpost_requests = $this->get_freight_requests($freight_packages,
                 $package, 'smartpost'))) {
             $this->run_package_request($smartpost_requests);
-        }
+        }*/
 
-        if ($this->freight_enabled && ($freight_requests = $this->get_freight_requests($freight_packages, $package,
-                'freight'))) {
+        if ($this->freight_enabled && ($freight_requests = $this->get_freight_requests($freight_packages, $package, 'freight'))) {
             $this->run_package_request($freight_requests);
         }
 
         // Ensure rates were found for all packages.
-        $packages_to_quote_count = sizeof($freight_requests);
+        $packages_to_quote_count = count($freight_requests);
 
         if ($this->found_rates) {
             foreach ($this->found_rates as $key => $value) {
                 if ($value['packages'] < $packages_to_quote_count) {
                     unset($this->found_rates[$key]);
                 } else {
-                    $meta_data = [];
+                    /*$meta_data = [];
                     if (isset($value['meta_data'])) {
                         $meta_data = $value['meta_data'];
-                    }
+                    }*/
 
                     foreach ($freight_packages as $freight_package) {
-                        $meta_data['Package '.$freight_package['GroupNumber']] = $this->get_rate_meta_data([
+                        /*$meta_data['Package '.$freight_package['GroupNumber']] = $this->get_rate_meta_data([
                             'length' => $freight_package['Dimensions']['Length'],
                             'width' => $freight_package['Dimensions']['Width'],
                             'height' => $freight_package['Dimensions']['Height'],
                             'weight' => $freight_package['Weight']['Value'],
                             'qty' => $freight_package['GroupPackageCount'],
-                        ]);
+                        ]);*/
                     }
-
                     $this->found_rates[$key]['meta_data'] = $meta_data;
                 }
             }
         }
-
         $this->add_found_rates();
     }
 
@@ -1169,20 +1157,20 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     {
         $this->debug('FREIGHT SHIPPING REQUEST: <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r($request,
                 true).'</pre>');
-        $rate_soap_file_location = plugin_dir_path(dirname(__FILE__)).'api/'.($this->production ? 'production' : 'test').'/RateService_v'.$this->rateservice_version.'.wsdl';
+        /*$rate_soap_file_location = plugin_dir_path(dirname(__FILE__)).'api/'.($this->production ? 'production' : 'test').'/RateService_v'.$this->rateservice_version.'.wsdl';*/
 
         try {
-            $client = new SoapClient($rate_soap_file_location, ['trace' => 1]);
-            $result = $client->getRates($request);
+            /*$client = new SoapClient($rate_soap_file_location, ['trace' => 1]);*/
+            /*$result = $client->getRates($request);*/
         } catch (Exception $e) {
             $stream_context_args = ['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]];
-            $soap_args = [
+            /*$soap_args = [
                 'trace' => 1,
                 'stream_context' => stream_context_create($stream_context_args),
-            ];
+            ];*/
 
-            $client = new SoapClient($rate_soap_file_location, $soap_args);
-            $result = $client->getRates($request);
+            /*$client = new SoapClient($rate_soap_file_location, $soap_args);
+            $result = $client->getRates($request);*/
         }
 
         $this->debug('FREIGHT SHIPPING RESPONSE: <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r($result,
@@ -1196,35 +1184,33 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 			});
 			jQuery('pre.debug_info').hide();
 		");
-
         return $result;
     }
 
     /**
-     * process_result function.
      *
-     * @access private
      *
      * @param  mixed  $result
      *
      * @return void
+     * @since  2.0.0
      */
     private function process_result($result = '')
     {
-        if ($result && !empty ($result->RateReplyDetails)) {
-            $rate_reply_details = $result->RateReplyDetails;
+        /*if ($result && !empty ($result->RateReplyDetails)) {
+            $rate_reply_details = $result->RateReplyDetails;*/
 
             // Workaround for when an object is returned instead of array
-            if (is_object($rate_reply_details) && isset($rate_reply_details->ServiceType)) {
+            /*if (is_object($rate_reply_details) && isset($rate_reply_details->ServiceType)) {
                 $rate_reply_details = [$rate_reply_details];
-            }
+            }*/
 
-            if (!is_array($rate_reply_details)) {
+            /*if (!is_array($rate_reply_details)) {
                 return false;
-            }
+            }*/
 
             foreach ($rate_reply_details as $quote) {
-                if (is_array($quote->RatedShipmentDetails)) {
+                /*if (is_array($quote->RatedShipmentDetails)) {
                     if ($this->request_type == "LIST") {
                         // LIST quotes return both ACCOUNT rates (in RatedShipmentDetails[1])
                         // and LIST rates (in RatedShipmentDetails[3])
@@ -1246,75 +1232,75 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                     }
                 } else {
                     $details = $quote->RatedShipmentDetails;
-                }
+                }*/
 
                 if (empty($details)) {
                     continue;
                 }
 
-                $rate_code = strval($quote->ServiceType);
+                $rate_code = (string) $quote->ServiceType;
                 $rate_id = $this->get_rate_id($rate_code);
-                $rate_name = strval($this->services[$quote->ServiceType]);
-                $rate_cost = floatval($details->ShipmentRateDetail->TotalNetCharge->Amount);
+                $rate_name = (string) $this->services[$quote->ServiceType];
+                $rate_cost = (float) $details->ShipmentRateDetail->TotalNetCharge->Amount;
 
                 $this->prepare_rate($rate_code, $rate_id, $rate_name, $rate_cost);
             }
-        }
+        //}
     }
 
     /**
-     * Prepare rate.
      *
-     * @access private
      *
      * @param  mixed  $rate_code  Rate code.
      * @param  mixed  $rate_id    Rate ID.
      * @param  mixed  $rate_name  Rate name.
      * @param  mixed  $rate_cost  Cost.
+     * @since  2.0.0
      */
     private function prepare_rate($rate_code, $rate_id, $rate_name, $rate_cost)
     {
         // Name adjustment.
-        if (!empty($this->custom_services[$rate_code]['name'])) {
+        /*if (!empty($this->custom_services[$rate_code]['name'])) {
             $rate_name = $this->custom_services[$rate_code]['name'];
-        }
+        }*/
 
         // Cost adjustment %.
-        if (!empty($this->custom_services[$rate_code]['adjustment_percent'])) {
-            $rate_cost = $rate_cost + ($rate_cost * (floatval($this->custom_services[$rate_code]['adjustment_percent']) / 100));
-        }
+        /*if (!empty($this->custom_services[$rate_code]['adjustment_percent'])) {
+            $rate_cost += ($rate_cost * ((float) $this->custom_services[$rate_code]['adjustment_percent'] / 100));
+        }*/
+
         // Cost adjustment.
-        if (!empty($this->custom_services[$rate_code]['adjustment'])) {
-            $rate_cost = $rate_cost + floatval($this->custom_services[$rate_code]['adjustment']);
-        }
+        /*if (!empty($this->custom_services[$rate_code]['adjustment'])) {
+            $rate_cost += (float) $this->custom_services[$rate_code]['adjustment'];
+        }*/
 
         // Enabled check.
-        if (isset($this->custom_services[$rate_code]) && empty($this->custom_services[$rate_code]['enabled'])) {
+        /*if (isset($this->custom_services[$rate_code]) && empty($this->custom_services[$rate_code]['enabled'])) {
             return;
-        }
+        }*/
 
         // Merging.
-        if (isset($this->found_rates[$rate_id])) {
+        /*if (isset($this->found_rates[$rate_id])) {
             $rate_cost = $rate_cost + $this->found_rates[$rate_id]['cost'];
             $packages = 1 + $this->found_rates[$rate_id]['packages'];
         } else {
             $packages = 1;
-        }
+        }*/
 
         // Sort.
-        if (isset($this->custom_services[$rate_code]['order'])) {
+        /*if (isset($this->custom_services[$rate_code]['order'])) {
             $sort = $this->custom_services[$rate_code]['order'];
         } else {
             $sort = 999;
-        }
+        }*/
 
-        $this->found_rates[$rate_id] = [
+        /*$this->found_rates[$rate_id] = [
             'id' => $rate_id,
             'label' => $rate_name,
             'cost' => $rate_cost,
             'sort' => $sort,
             'packages' => $packages,
-        ];
+        ];*/
     }
 
     /**
@@ -1322,10 +1308,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      *
      * @param  array  $params  Meta data info to join.
      *
-     * @return string Rate meta data.
-     * @since   3.4.9
-     * @version 3.4.9
-     *
+     * @return  string Rate meta data.
+     * @since   2.0.0
      */
     private function get_rate_meta_data($params)
     {
@@ -1350,15 +1334,13 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
     /**
      * Add found rates to WooCommerce
+     *
+     * @return void
+     * @since  2.0.0
      */
     public function add_found_rates()
     {
         if ($this->found_rates) {
-            // remove ground rates if shipping internationally
-            if ($this->is_shipping_internationally() && !$this->need_direct_distribution()) {
-                unset($this->found_rates['freight:FREIGHT_GROUND']);
-            }
-
             if ($this->offer_rates == 'all') {
                 uasort($this->found_rates, [$this, 'sort_rates']);
 
@@ -1373,9 +1355,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                         $cheapest_rate = $rate;
                     }
                 }
-
                 $cheapest_rate['label'] = $this->title;
-
                 $this->add_rate($cheapest_rate);
             }
         }
@@ -1386,17 +1366,17 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      *
      * @return bool
      */
-    public function is_shipping_internationally()
+    /*public function is_shipping_internationally()
     {
         // compare base and package country: not equal for international shipping
         return (WC()->countries->get_base_country() !== $this->package['destination']['country'] && 'CA' !== $this->package['destination']['country'] && 'US' !== $this->package['destination']['country']);
-    }
+    }*/
 
     /**
      *
      * @return bool
      */
-    public function need_direct_distribution()
+    /*public function need_direct_distribution()
     {
         if ($this->direct_distribution) {
             if ('US' === WC()->countries->get_base_country() && 'CA' === $this->package['destination']['country']) {
@@ -1409,7 +1389,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         }
 
         return false;
-    }
+    }*/
 
     /**
      * sort_rates function.
@@ -1418,6 +1398,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * @param  mixed  $b
      *
      * @return int
+     * @since  2.0.0
      */
     public function sort_rates($a, $b)
     {
