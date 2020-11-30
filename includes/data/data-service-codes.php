@@ -8,10 +8,10 @@
 
  return [
      'ODFL' => [
-         'name' => 'Old Domain Freight',
+         'name' => 'OLD DOMINION FREIGHT LINE INC',
          'enabled' => true,
          'adjustment' => 0.00,
          'adjustment_percent' => 0.00
-     ]
+     ],
  ];
 
