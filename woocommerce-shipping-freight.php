@@ -12,6 +12,8 @@
  * Copyright: 2020 Atomic Design & Consulting
  */
 
+require 'vendor/autoload.php';
+
 if (!function_exists('woothemes_queue_update')) {
     require_once('woo-includes/woo-functions.php');
 }
@@ -52,7 +54,7 @@ class WC_Shipping_Freight_Init
     {
         $this->version = WC_SHIPPING_FREIGHT_VERSION;
 
-        if (class_exists('WC_Shipping_Method') && class_exists('SoapClient') && version_compare(WC_VERSION, '2.6.0', '>')) {
+        if (class_exists('WC_Shipping_Method') && class_exists('XMLWriter') && version_compare(WC_VERSION, '2.6.0', '>')) {
             add_action('admin_init', [$this, 'maybe_install'], 5);
             add_action('init', [$this, 'load_textdomain']);
             add_filter('plugin_action_links_'.plugin_basename(__FILE__), [$this, 'plugin_links']);

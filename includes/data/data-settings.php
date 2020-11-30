@@ -4,8 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$shipping_class_link = version_compare(WC_VERSION, '2.6',
-    '>=') ? admin_url('admin.php?page=wc-settings&tab=shipping&section=classes') : admin_url('edit-tags.php?taxonomy=product_shipping_class&post_type=product');
+$shipping_class_link = admin_url('admin.php?page=wc-settings&tab=shipping&section=classes');
 
 return [
     'title' => [
@@ -15,6 +14,7 @@ return [
         'default' => __('Freight Shipping', 'woocommerce-shipping-freight'),
         'desc_tip' => true,
     ],
+
     'origin' => [
         'title' => __('Origin Postcode', 'woocommerce-shipping-freight'),
         'type' => 'text',
@@ -22,41 +22,52 @@ return [
         'default' => '',
         'desc_tip' => true,
     ],
+
     'packing' => [
         'title' => __('Packages', 'woocommerce-shipping-freight'),
         'type' => 'title',
-        'description' => __('The following settings determine how items are packed before being sent to Freight.',
+        'description' => __('The following settings determine how items are packed before being sent to freight.',
             'woocommerce-shipping-freight'),
     ],
+
     'packing_method' => [
-        'title' => __('Parcel Packing Method', 'woocommerce-shipping-freight'),
+        'title' => __('Packing Method', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'default' => '',
         'class' => 'packing_method',
         'options' => [
-            'per_item' => __('Default: Pack items individually', 'woocommerce-shipping-freight'),
-            'box_packing' => __('Recommended: Pack into boxes with weights and dimensions', 'woocommerce-shipping-freight'),
+            'per_item' => __('Default: Pack items individually (1:1)', 'woocommerce-shipping-freight'),
+            'box_packing' => __('Pack into boxes with weights and dimensions (1:many)', 'woocommerce-shipping-freight'),
         ],
     ],
+
     'boxes' => [
         'type' => 'box_packing',
     ],
+
     'rates' => [
         'title' => __('Rates and Services', 'woocommerce-shipping-freight'),
         'type' => 'title',
         'description' => __('The following settings determine the rates you offer your customers.',
             'woocommerce-shipping-freight'),
     ],
+
     'residential' => [
         'title' => __('Residential', 'woocommerce-shipping-freight'),
         'label' => __('Default to residential delivery', 'woocommerce-shipping-freight'),
         'type' => 'checkbox',
-        'default' => 'no',
-        'description' => __('Enables residential flag. If you account has Address Validation enabled, this will be turned off/on automatically.',
-            'woocommerce-shipping-freight'),
+        'disabled' => true,
+        'default' => 'yes',
+        /* // address validation is out of scope for now.
+         * 'description' => __('Enables residential flag. If you account has Address Validation enabled, this will be turned off/on automatically.', 'woocommerce-shipping-freight'),*/
+        'description' => __('Enables residential flag.', 'woocommerce-shipping-freight'),
         'desc_tip' => true,
+        'class' => 'manuallyChecked'
+
     ],
-    'request_type' => [
+
+    /* //this feature is out of scope, always List Rates.
+     * 'request_type' => [
         'title' => __('Request Type', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'default' => 'LIST',
@@ -68,17 +79,20 @@ return [
         ],
         'description' => __('Choose whether to return List or Account (discounted) rates from the API.',
             'woocommerce-shipping-freight'),
-    ],
-    'offer_rates' => [
+    ],*/
+
+    /* // this feature is out of scope, only one rate will be retrieved for now.
+     *'offer_rates' => [
         'title' => __('Offer Rates', 'woocommerce-shipping-freight'),
         'type' => 'select',
         'description' => '',
         'default' => 'all',
         'options' => [
-            /*'all' => __('Offer the customer all returned rates', 'woocommerce-shipping-freight'),*/
-            'cheapest' => __('Offer the customer the cheapest rate only, anonymously', 'woocommerce-shipping-freight'),
+            'all' => __('Offer the customer all returned rates', 'woocommerce-shipping-freight'),
+            'cheapest' => __('Offer the customer the one rate only.', 'woocommerce-shipping-freight'),
         ],
-    ],
+    ],*/
+
     'services' => [
         'type' => 'services',
     ],

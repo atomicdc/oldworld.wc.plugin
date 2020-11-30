@@ -1,21 +1,23 @@
 <?php
+
+/**
+ * Add additional custom crate sizes and packaging here.
+ * The 'id' in the below array should correspond to the API endpoint's
+ * expected value for its respective packaging.
+ *
+ * Note: Accurate weights and dimensions are critical for auto-packaging
+ * to function properly.
+ */
+
 return [
     [
         'name' => 'Crate',
         'id' => 'CRATE',
-        'max_weight' => 150,
+        'enabled' => true,
+        'max_weight' => 250,
         'box_weight' => 0,
-        'length' => 12.375,
-        'width' => 10.875,
-        'height' => 1.5,
-    ]/*,
-    [
-        'name' => 'Freight&#174; Small Box',
-        'id' => 'FREIGHT_SMALL_BOX:2',
-        'max_weight' => 150,
-        'box_weight' => 0,
-        'length' => 11.25,
-        'width' => 8.75,
-        'height' => 2.625,
-    ],*/
+        'length' => 12,
+        'width' => 12,
+        'height' => 12,
+    ]
 ];

@@ -29,8 +29,7 @@ class WC_Freight_Mapping
     public function get_shipping_classes($classes)
     {
         foreach ($classes as $class) {
-            $class->freight_class = version_compare(WC_VERSION, '3.6', 'ge') ? get_term_meta($class->term_id,
-                'freight_class', true) : get_woocommerce_term_meta($class->term_id, 'freight_class', true);
+            $class->freight_class = get_term_meta($class->term_id, 'freight_class', true);
             $class->display_freight_class = $class->freight_class ? $this->classes[$class->freight_class] : '-';
         }
 
