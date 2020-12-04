@@ -7,10 +7,16 @@
  */
 
  return [
-     'ODFL' => [
+     'ODFL BLANKET' => [
          'name' => 'OLD DOMINION FREIGHT LINE INC',
          'enabled' => true,
-         'adjustment' => 0.00,
+         'adjustment' => 350.00,
+         'adjustment_percent' => 0.00
+     ],
+     'CRATE FEE' => [
+         'name' => 'Per Crate, when total weight is greater than 250',
+         'enabled' => true,
+         'adjustment' => 250.00,
          'adjustment_percent' => 0.00
      ],
  ];
