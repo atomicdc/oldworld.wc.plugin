@@ -37,7 +37,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     public function is_available($package)
     {
-
         if (empty($package['destination']['country'])) {
             return false;
         }
@@ -496,8 +495,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     private function box_shipping($package)
     {
-        $this->debug('<pre class="debug_info">'.$this->orderCount++.' box_shipping line 500</pre>');
-
         if (!class_exists('WC_Boxpack')) {
             include_once 'box-packer/class-wc-boxpack.php';
         }
@@ -814,7 +811,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         $payload = $this->writer->outputMemory(true);
 
-        $this->debug('FREIGHT SHIPPING REQUEST (from get_freight_api_request line 706): <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r('Date/Time: '.date('Y-m-d H:i:s').'<br />API endpoint: '.$this->api_url.'<br />Payload: '.$payload, true).'</pre>');
+        $this->debug('FREIGHT SHIPPING REQUEST (get_freight_api_request): <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r('Date/Time: '.date('Y-m-d H:i:s').'<br />API endpoint: '.$this->api_url.'<br />Payload: '.$payload, true).'</pre>');
 
         //return $result;
         return apply_filters('woocommerce_freight_api_request', $payload);
@@ -900,8 +897,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     public function run_package_request($requests)
     {
-        $this->debug('<pre class="debug_info">'.$this->orderCount++.' run_package_request line 1072</pre>');
-
         try {
             if (is_array($requests)) {
                 foreach ($requests as $request) {
@@ -926,9 +921,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     private function get_result($request)
     {
-        $this->debug('<pre class="debug_info">'.$this->orderCount++.' get_result line 1147</pre>');
-        $this->debug('FREIGHT SHIPPING REQUEST (get_result line 1147): <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r($this->api_url.'<br />'.$request, true).'</pre>');
-
         try {
             //$payload = $this->get_freight_api_request($request);
 
@@ -989,8 +981,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     private function process_result($result)
     {
-        $this->debug('<pre class="debug_info">'.$this->orderCount++.' process_result line 1223</pre>');
-
         if (!$result->StatusCode) {
             $this->debug('FREIGHT SHIPPING RESPONSE (STATUSCODE NOT ZERO) :  <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r($result, true).'</pre>');
 

@@ -12,7 +12,7 @@
  * Copyright: 2020 Atomic Design & Consulting
  */
 
-require 'vendor/autoload.php';
+//require 'vendor/autoload.php';
 
 if (!function_exists('woothemes_queue_update')) {
     require_once('woo-includes/woo-functions.php');
