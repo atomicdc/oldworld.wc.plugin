@@ -1,5 +1,23 @@
 <?php
 
-return [
-    'API_FREIGHT_KEY' => 'Front End Freight Key'
-];
+/**
+ * Add custom services here if ever offer more than freight or ODFL.
+ * The key in the below array should correspond to the API endpoint's
+ * expected value for its respective service.
+ */
+
+ return [
+     'ODFL BLANKET' => [
+         'name' => 'OLD DOMINION FREIGHT LINE INC',
+         'enabled' => true,
+         'adjustment' => 350.00,
+         'adjustment_percent' => 0.00
+     ],
+     'CRATE FEE' => [
+         'name' => 'Per Crate, when total weight is greater than 250',
+         'enabled' => true,
+         'adjustment' => 250.00,
+         'adjustment_percent' => 0.00
+     ],
+ ];
+

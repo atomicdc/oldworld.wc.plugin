@@ -1,444 +1,402 @@
 <?php
 
-class WC_Boxpack_Box
-{
-    /** @var string ID of the box - given to packages */
-    private $id = '';
+/**
+ * WC_Boxpack_Box class.
+ */
+class WC_Boxpack_Box {
 
-    /** @var float Weight of the box itself */
-    private $weight;
+	/** @var string ID of the box - given to packages */
+	private $id = '';
 
-    /** @var float Max allowed weight of box + contents */
-    private $max_weight = 0;
+	/** @var float Weight of the box itself */
+	private $weight;
 
-    /** @var float Outer dimension of box sent to shipper */
-    private $outer_height;
+	/** @var float Max allowed weight of box + contents */
+	private $max_weight = 0;
 
-    /** @var float Outer dimension of box sent to shipper */
-    private $outer_width;
+	/** @var float Outer dimension of box sent to shipper */
+	private $outer_height;
 
-    /** @var float Outer dimension of box sent to shipper */
-    private $outer_length;
+	/** @var float Outer dimension of box sent to shipper */
+	private $outer_width;
 
-    /** @var float Inner dimension of box used when packing */
-    private $height;
+	/** @var float Outer dimension of box sent to shipper */
+	private $outer_length;
 
-    /** @var float Inner dimension of box used when packing */
-    private $width;
+	/** @var float Inner dimension of box used when packing */
+	private $height;
 
-    /** @var float Inner dimension of box used when packing */
-    private $length;
+	/** @var float Inner dimension of box used when packing */
+	private $width;
 
-    /** @var float Dimension is stored here if adjusted during packing */
-    private $packed_height;
-    private $maybe_packed_height = null;
+	/** @var float Inner dimension of box used when packing */
+	private $length;
 
-    /** @var float Dimension is stored here if adjusted during packing */
-    private $packed_width;
-    private $maybe_packed_width = null;
+	/** @var float Dimension is stored here if adjusted during packing */
+	private $packed_height;
+	private $maybe_packed_height = null;
 
-    /** @var float Dimension is stored here if adjusted during packing */
-    private $packed_length;
-    private $maybe_packed_length = null;
+	/** @var float Dimension is stored here if adjusted during packing */
+	private $packed_width;
+	private $maybe_packed_width = null;
 
-    /** @var float Volume of the box */
-    private $volume;
+	/** @var float Dimension is stored here if adjusted during packing */
+	private $packed_length;
+	private $maybe_packed_length = null;
 
-    /** @var Array Valid box types which affect packing */
-    private $valid_types = ['box', 'tube', 'envelope', 'packet'];
+	/** @var float Volume of the box */
+	private $volume;
 
-    /** @var string This box type */
-    private $type = 'box';
+	/** @var Array Valid box types which affect packing */
+	private $valid_types = array( 'box', 'tube', 'envelope', 'packet' );
 
-    /**
-     * __construct function.
-     *
-     * @param $length     float Length.
-     * @param $width      float Width.
-     * @param $height     float Height.
-     * @param $weight     float Weight.
-     * @param $max_weight float Maximum weight the package can be.
-     * @param $type       string Package Type.
-     *
-     * @return void
-     * @since 1.0.2 add `$max_weight` and `$type` optional params
-     *
-     */
-    public function __construct($length, $width, $height, $weight = 0.0, $max_weight = 0.0, $type = 'box')
-    {
-        $dimensions = [$length, $width, $height];
+	/** @var string This box type */
+	private $type = 'box';
 
-        sort($dimensions);
+	/**
+	 * __construct function.
+	 *
+	 * @since 1.0.2 add `$max_weight` and `$type` optional params
+	 *
+	 * @param $length float Length.
+	 * @param $width float Width.
+	 * @param $height float Height.
+	 * @param $weight float Weight.
+	 * @param $max_weight float Maximum weight the package can be.
+	 * @param $type string Package Type.
+	 * @return void
+	 */
+	public function __construct( $length, $width, $height, $weight = 0.0, $max_weight = 0.0, $type = 'box' ) {
+		$dimensions = array( $length, $width, $height );
 
-        $this->outer_length = $this->length = floatval($dimensions[2]);
-        $this->outer_width = $this->width = floatval($dimensions[1]);
-        $this->outer_height = $this->height = floatval($dimensions[0]);
-        $this->weight = floatval($weight);
-        $this->max_weight = $max_weight;
+		sort( $dimensions );
 
-        if (in_array($type, $this->valid_types)) {
-            $this->type = $type;
-        }
-    }
+		$this->outer_length = $this->length = floatval( $dimensions[2] );
+		$this->outer_width  = $this->width  = floatval( $dimensions[1] );
+		$this->outer_height = $this->height = floatval( $dimensions[0] );
+		$this->weight       = floatval( $weight );
+		$this->max_weight   = $max_weight;
 
-    /**
-     * set_id function.
-     *
-     * @access public
-     *
-     * @param  mixed  $id
-     *
-     * @return void
-     */
-    public function set_id($id)
-    {
-        $this->id = $id;
-    }
+		if ( in_array( $type, $this->valid_types ) ) {
+			$this->type = $type;
+		}
+	}
 
-    /**
-     * Set the volume to a specific value, instead of calculating it.
-     *
-     * @param  float  $volume
-     */
-    public function set_volume($volume)
-    {
-        $this->volume = floatval($volume);
-    }
+	/**
+	 * set_id function.
+	 *
+	 * @access public
+	 * @param mixed $id
+	 * @return void
+	 */
+	public function set_id( $id ) {
+		$this->id = $id;
+	}
 
-    /**
-     * Get the type of the box.
-     *
-     * @return string Box type.
-     * @version 1.0.1
-     *
-     * @since   1.0.1
-     */
-    public function get_type()
-    {
-        return $this->type;
-    }
+	/**
+	 * Set the volume to a specific value, instead of calculating it.
+	 * @param float $volume
+	 */
+	public function set_volume( $volume ) {
+		$this->volume = floatval( $volume );
+	}
 
-    /**
-     * Set the type of box
-     *
-     * @param  string  $type
-     */
-    public function set_type($type)
-    {
-        if (in_array($type, $this->valid_types)) {
-            $this->type = $type;
-        }
-    }
+	/**
+	 * Get the type of the box.
+	 *
+	 * @since 1.0.1
+	 * @version 1.0.1
+	 *
+	 * @return string Box type.
+	 */
+	public function get_type() {
+		return $this->type;
+	}
 
-    /**
-     * Get max weight.
-     *
-     * @return float
-     */
-    public function get_max_weight()
-    {
-        return floatval($this->max_weight);
-    }
+	/**
+	 * Set the type of box
+	 * @param string $type
+	 */
+	public function set_type( $type ) {
+		if ( in_array( $type, $this->valid_types ) ) {
+			$this->type = $type;
+		}
+	}
 
-    /**
-     * set_max_weight function.
-     *
-     * @access public
-     *
-     * @param  mixed  $weight
-     *
-     * @return void
-     */
-    public function set_max_weight($weight)
-    {
-        $this->max_weight = $weight;
-    }
+	/**
+	 * Get max weight.
+	 *
+	 * @return float
+	 */
+	public function get_max_weight() {
+		return floatval( $this->max_weight );
+	}
 
-    /**
-     * set_inner_dimensions function.
-     *
-     * @access public
-     *
-     * @param  mixed  $length
-     * @param  mixed  $width
-     * @param  mixed  $height
-     *
-     * @return void
-     */
-    public function set_inner_dimensions($length, $width, $height)
-    {
-        $dimensions = [$length, $width, $height];
+	/**
+	 * set_max_weight function.
+	 *
+	 * @access public
+	 * @param mixed $weight
+	 * @return void
+	 */
+	public function set_max_weight( $weight ) {
+		$this->max_weight = $weight;
+	}
 
-        sort($dimensions);
+	/**
+	 * set_inner_dimensions function.
+	 *
+	 * @access public
+	 * @param mixed $length
+	 * @param mixed $width
+	 * @param mixed $height
+	 * @return void
+	 */
+	public function set_inner_dimensions( $length, $width, $height ) {
+		$dimensions = array( $length, $width, $height );
 
-        $this->length = $dimensions[2];
-        $this->width = $dimensions[1];
-        $this->height = $dimensions[0];
-    }
+		sort( $dimensions );
 
-    /**
-     * See if an item fits into the box.
-     *
-     * @param  object  $item
-     *
-     * @return bool
-     */
-    public function can_fit($item)
-    {
-        switch ($this->type) {
-            // Tubes are designed for long thin items so see if the item meets that criteria here.
-            case 'tube':
-                $can_fit = ($this->get_length() >= $item->get_length() && $this->get_width() >= $item->get_width() && $this->get_height() >= $item->get_height() && $item->get_volume() <= $this->get_volume()) ? true : false;
-                $can_fit = $can_fit && $item->get_length() >= (($item->get_width() + $this->get_height()) * 2);
-                break;
-            // Packets are flexible
+		$this->length = $dimensions[2];
+		$this->width  = $dimensions[1];
+		$this->height = $dimensions[0];
+	}
 
-            case 'packet':
-                $can_fit = ($this->get_packed_length() >= $item->get_length() && $this->get_packed_width() >= $item->get_width() && $item->get_volume() <= $this->get_volume()) ? true : false;
+	/**
+	 * See if an item fits into the box.
+	 *
+	 * @param object $item
+	 * @return bool
+	 */
+	public function can_fit( $item ) {
+		switch ( $this->type ) {
+			// Tubes are designed for long thin items so see if the item meets that criteria here.
+			case 'tube':
+				$can_fit = ( $this->get_length() >= $item->get_length() && $this->get_width() >= $item->get_width() && $this->get_height() >= $item->get_height() && $item->get_volume() <= $this->get_volume() ) ? true : false;
+				$can_fit = $can_fit && $item->get_length() >= ( ( $item->get_width() + $this->get_height() ) * 2 );
+				break;
+			// Packets are flexible
 
-                if ($can_fit && $item->get_height() > $this->get_packed_height()) {
-                    $this->maybe_packed_height = $item->get_height();
-                    $this->maybe_packed_length = $this->get_packed_length() - ($this->maybe_packed_height - $this->get_height());
-                    $this->maybe_packed_width = $this->get_packed_width() - ($this->maybe_packed_height - $this->get_height());
+			case 'packet':
+				$can_fit = ( $this->get_packed_length() >= $item->get_length() && $this->get_packed_width() >= $item->get_width() && $item->get_volume() <= $this->get_volume() ) ? true : false;
 
-                    $can_fit = ($this->maybe_packed_height < $this->maybe_packed_width && $this->maybe_packed_length >= $item->get_length() && $this->maybe_packed_width >= $item->get_width()) ? true : false;
-                }
-                break;
-            // Boxes are easy
-            default:
-                $can_fit = ($this->get_length() >= $item->get_length() && $this->get_width() >= $item->get_width() && $this->get_height() >= $item->get_height() && $item->get_volume() <= $this->get_volume()) ? true : false;
-                break;
-        }
+				if ( $can_fit && $item->get_height() > $this->get_packed_height() ) {
+					$this->maybe_packed_height = $item->get_height();
+					$this->maybe_packed_length = $this->get_packed_length() - ( $this->maybe_packed_height - $this->get_height() );
+					$this->maybe_packed_width  = $this->get_packed_width()  - ( $this->maybe_packed_height - $this->get_height() );
 
-        return $can_fit;
-    }
+					$can_fit = ( $this->maybe_packed_height < $this->maybe_packed_width && $this->maybe_packed_length >= $item->get_length() && $this->maybe_packed_width >= $item->get_width() ) ? true : false;
+				}
+				break;
+			// Boxes are easy
+			default:
+				$can_fit = ( $this->get_length() >= $item->get_length() && $this->get_width() >= $item->get_width() && $this->get_height() >= $item->get_height() && $item->get_volume() <= $this->get_volume() ) ? true : false;
+				break;
+		}
 
-    /**
-     * Reset packed dimensions to originals
-     */
-    private function reset_packed_dimensions()
-    {
-        $this->packed_length = $this->length;
-        $this->packed_width = $this->width;
-        $this->packed_height = $this->height;
-    }
+		return $can_fit;
+	}
 
-    /**
-     * pack function.
-     *
-     * @access public
-     *
-     * @param  mixed  $items
-     *
-     * @return object Package
-     */
-    public function pack($items)
-    {
-        $packed = [];
-        $unpacked = [];
-        $packed_weight = $this->get_weight();
-        $packed_volume = 0;
-        $packed_value = 0;
+	/**
+	 * Reset packed dimensions to originals
+	 */
+	private function reset_packed_dimensions() {
+		$this->packed_length = $this->length;
+		$this->packed_width  = $this->width;
+		$this->packed_height = $this->height;
+	}
 
-        $this->reset_packed_dimensions();
+	/**
+	 * pack function.
+	 *
+	 * @access public
+	 * @param mixed $items
+	 * @return object Package
+	 */
+	public function pack( $items ) {
+		$packed        = array();
+		$unpacked      = array();
+		$packed_weight = $this->get_weight();
+		$packed_volume = 0;
+		$packed_value  = 0;
 
-        while (sizeof($items) > 0) {
-            $item = array_shift($items);
+		$this->reset_packed_dimensions();
 
-            // Check dimensions
-            if (!$this->can_fit($item)) {
-                $unpacked[] = $item;
-                continue;
-            }
+		while ( sizeof( $items ) > 0 ) {
+			$item = array_shift( $items );
 
-            // Check max weight
-            if (($packed_weight + $item->get_weight()) > $this->get_max_weight() && $this->get_max_weight() > 0) {
-                $unpacked[] = $item;
-                continue;
-            }
+			// Check dimensions
+			if ( ! $this->can_fit( $item ) ) {
+				$unpacked[] = $item;
+				continue;
+			}
 
-            // Check volume
-            if (($packed_volume + $item->get_volume()) > $this->get_volume()) {
-                $unpacked[] = $item;
-                continue;
-            }
+			// Check max weight
+			if ( ( $packed_weight + $item->get_weight() ) > $this->get_max_weight() && $this->get_max_weight() > 0 ) {
+				$unpacked[] = $item;
+				continue;
+			}
 
-            // Pack
-            $packed[] = $item;
-            $packed_volume += $item->get_volume();
-            $packed_weight += $item->get_weight();
-            $packed_value += $item->get_value();
+			// Check volume
+			if ( ( $packed_volume + $item->get_volume() ) > $this->get_volume() ) {
+				$unpacked[] = $item;
+				continue;
+			}
 
-            // Adjust dimensions if needed, after this item has been packed inside
-            if (!is_null($this->maybe_packed_height)) {
-                $this->packed_height = $this->maybe_packed_height;
-                $this->packed_length = $this->maybe_packed_length;
-                $this->packed_width = $this->maybe_packed_width;
-                $this->maybe_packed_height = null;
-                $this->maybe_packed_length = null;
-                $this->maybe_packed_width = null;
-            }
-        }
+			// Pack
+			$packed[]      = $item;
+			$packed_volume += $item->get_volume();
+			$packed_weight += $item->get_weight();
+			$packed_value  += $item->get_value();
 
-        // Get weight of unpacked items
-        $unpacked_weight = 0;
-        $unpacked_volume = 0;
-        foreach ($unpacked as $item) {
-            $unpacked_weight += $item->get_weight();
-            $unpacked_volume += $item->get_volume();
-        }
+			// Adjust dimensions if needed, after this item has been packed inside
+			if ( ! is_null( $this->maybe_packed_height ) ) {
+				$this->packed_height       = $this->maybe_packed_height;
+				$this->packed_length       = $this->maybe_packed_length;
+				$this->packed_width        = $this->maybe_packed_width;
+				$this->maybe_packed_height = null;
+				$this->maybe_packed_length = null;
+				$this->maybe_packed_width  = null;
+			}
+		}
 
-        $package = new stdClass();
-        $package->id = $this->id;
-        $package->type = $this->type;
-        $package->packed = $packed;
-        $package->unpacked = $unpacked;
-        $package->weight = $packed_weight;
-        $package->volume = $packed_volume;
-        $package->length = $this->get_outer_length();
-        $package->width = $this->get_outer_width();
-        $package->height = $this->get_outer_height();
-        $package->value = $packed_value;
+		// Get weight of unpacked items
+		$unpacked_weight = 0;
+		$unpacked_volume = 0;
+		foreach ( $unpacked as $item ) {
+			$unpacked_weight += $item->get_weight();
+			$unpacked_volume += $item->get_volume();
+		}
 
-        // Calculate packing success % based on % of weight and volume of all items packed
-        $packed_weight_ratio = null;
-        $packed_volume_ratio = null;
-        $packed_weight_to_compare = $packed_weight - $this->get_weight();
+		$package           = new stdClass();
+		$package->id       = $this->id;
+		$package->type     = $this->type;
+		$package->packed   = $packed;
+		$package->unpacked = $unpacked;
+		$package->weight   = $packed_weight;
+		$package->volume   = $packed_volume;
+		$package->length   = $this->get_outer_length();
+		$package->width    = $this->get_outer_width();
+		$package->height   = $this->get_outer_height();
+		$package->value    = $packed_value;
 
-        if ($packed_weight_to_compare + $unpacked_weight > 0) {
-            $packed_weight_ratio = $packed_weight_to_compare / ($packed_weight_to_compare + $unpacked_weight);
-        }
-        if ($packed_volume + $unpacked_volume) {
-            $packed_volume_ratio = $packed_volume / ($packed_volume + $unpacked_volume);
-        }
+		// Calculate packing success % based on % of weight and volume of all items packed
+		$packed_weight_ratio      = null;
+		$packed_volume_ratio      = null;
+		$packed_weight_to_compare = $packed_weight - $this->get_weight();
 
-        if (is_null($packed_weight_ratio) && is_null($packed_volume_ratio)) {
-            // Fallback to amount packed
-            $package->percent = (sizeof($packed) / (sizeof($unpacked) + sizeof($packed))) * 100;
-        } else if (is_null($packed_weight_ratio)) {
-            // Volume only
-            $package->percent = $packed_volume_ratio * 100;
-        } else if (is_null($packed_volume_ratio)) {
-            // Weight only
-            $package->percent = $packed_weight_ratio * 100;
-        } else {
-            $package->percent = $packed_weight_ratio * $packed_volume_ratio * 100;
-        }
+		if ( $packed_weight_to_compare + $unpacked_weight > 0 ) {
+			$packed_weight_ratio = $packed_weight_to_compare / ( $packed_weight_to_compare + $unpacked_weight );
+		}
+		if ( $packed_volume + $unpacked_volume ) {
+			$packed_volume_ratio = $packed_volume / ( $packed_volume + $unpacked_volume );
+		}
 
-        return $package;
-    }
+		if ( is_null( $packed_weight_ratio ) && is_null( $packed_volume_ratio ) ) {
+			// Fallback to amount packed
+			$package->percent = ( sizeof( $packed ) / ( sizeof( $unpacked ) + sizeof( $packed ) ) ) * 100;
+		} elseif ( is_null( $packed_weight_ratio ) ) {
+			// Volume only
+			$package->percent = $packed_volume_ratio * 100;
+		} elseif ( is_null( $packed_volume_ratio ) ) {
+			// Weight only
+			$package->percent = $packed_weight_ratio * 100;
+		} else {
+			$package->percent = $packed_weight_ratio * $packed_volume_ratio * 100;
+		}
 
-    /**
-     * get_volume function.
-     *
-     * @return float
-     */
-    public function get_volume()
-    {
-        if ($this->volume) {
-            return $this->volume;
-        } else {
-            return floatval($this->get_height() * $this->get_width() * $this->get_length());
-        }
-    }
+		return $package;
+	}
 
-    /**
-     * get_height function.
-     *
-     * @return float
-     */
-    public function get_height()
-    {
-        return $this->height;
-    }
+	/**
+	 * get_volume function.
+	 * @return float
+	 */
+	public function get_volume() {
+		if ( $this->volume ) {
+			return $this->volume;
+		} else {
+			return floatval( $this->get_height() * $this->get_width() * $this->get_length() );
+		}
+	}
 
-    /**
-     * get_width function.
-     *
-     * @return float
-     */
-    public function get_width()
-    {
-        return $this->width;
-    }
+	/**
+	 * get_height function.
+	 * @return float
+	 */
+	public function get_height() {
+		return $this->height;
+	}
 
-    /**
-     * get_width function.
-     *
-     * @return float
-     */
-    public function get_length()
-    {
-        return $this->length;
-    }
+	/**
+	 * get_width function.
+	 * @return float
+	 */
+	public function get_width() {
+		return $this->width;
+	}
 
-    /**
-     * get_weight function.
-     *
-     * @return float
-     */
-    public function get_weight()
-    {
-        return $this->weight;
-    }
+	/**
+	 * get_width function.
+	 * @return float
+	 */
+	public function get_length() {
+		return $this->length;
+	}
 
-    /**
-     * get_outer_height
-     *
-     * @return float
-     */
-    public function get_outer_height()
-    {
-        return $this->outer_height;
-    }
+	/**
+	 * get_weight function.
+	 * @return float
+	 */
+	public function get_weight() {
+		return $this->weight;
+	}
 
-    /**
-     * get_outer_width
-     *
-     * @return float
-     */
-    public function get_outer_width()
-    {
-        return $this->outer_width;
-    }
+	/**
+	 * get_outer_height
+	 * @return float
+	 */
+	public function get_outer_height() {
+		return $this->outer_height;
+	}
 
-    /**
-     * get_outer_length
-     *
-     * @return float
-     */
-    public function get_outer_length()
-    {
-        return $this->outer_length;
-    }
+	/**
+	 * get_outer_width
+	 * @return float
+	 */
+	public function get_outer_width() {
+		return $this->outer_width;
+	}
 
-    /**
-     * get_packed_height
-     *
-     * @return float
-     */
-    public function get_packed_height()
-    {
-        return $this->packed_height;
-    }
+	/**
+	 * get_outer_length
+	 * @return float
+	 */
+	public function get_outer_length() {
+		return $this->outer_length;
+	}
 
-    /**
-     * get_packed_width
-     *
-     * @return float
-     */
-    public function get_packed_width()
-    {
-        return $this->packed_width;
-    }
+	/**
+	 * get_packed_height
+	 * @return float
+	 */
+	public function get_packed_height() {
+		return $this->packed_height;
+	}
 
-    /**
-     * get_width get_packed_length.
-     *
-     * @return float
-     */
-    public function get_packed_length()
-    {
-        return $this->packed_length;
-    }
+	/**
+	 * get_packed_width
+	 * @return float
+	 */
+	public function get_packed_width() {
+		return $this->packed_width;
+	}
+
+	/**
+	 * get_width get_packed_length.
+	 * @return float
+	 */
+	public function get_packed_length() {
+		return $this->packed_length;
+	}
 }

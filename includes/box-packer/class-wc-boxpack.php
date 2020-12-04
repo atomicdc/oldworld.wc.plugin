@@ -4,282 +4,266 @@
  * WooCommerce Box Packer
  *
  * @version 1.0.2
- * @author  WooThemes / Mike Jolley
+ * @author WooThemes / Mike Jolley
  */
-class WC_Boxpack
-{
-    /**
-     * @since 1.0.2
-     */
-    const VERSION = '1.0.2';
+class WC_Boxpack {
 
-    private $boxes;
-    private $items;
-    private $packages;
-    private $cannot_pack;
+	/**
+	 * @since 1.0.2
+	 */
+	const VERSION = '1.0.2';
 
-    /**
-     * @var bool Try to pack into envelopes and packets
-     */
-    private $prefer_packets = false;
+	private $boxes;
+	private $items;
+	private $packages;
+	private $cannot_pack;
 
-    /**
-     * __construct function.
-     *
-     * @param  array  $options        {
-     *                                Optional. An array of options.
-     *
-     * @type bool     $prefer_packets Pack into packets before boxes.
-     * }
-     * @return void
-     * @since 1.0.2 Added `$options` parameter and '$prefer_packets' option.
-     *
-     */
-    public function __construct(array $options = [])
-    {
-        if (isset($options['prefer_packets'])) {
-            $this->prefer_packets = $options['prefer_packets'];
-        }
-        include_once('class-wc-boxpack-box.php');
-        include_once('class-wc-boxpack-item.php');
-    }
+	/**
+	 * @var bool Try to pack into envelopes and packets
+	 */
+	private $prefer_packets = false;
 
-    /**
-     * clear_items function.
-     *
-     * @access public
-     * @return void
-     */
-    public function clear_items()
-    {
-        $this->items = [];
-    }
+	/**
+	 * __construct function.
+	 *
+	 * @since 1.0.2 Added `$options` parameter and '$prefer_packets' option.
+	 *
+	 * @param array $options {
+	 *     Optional. An array of options.
+	 *     @type bool $prefer_packets Pack into packets before boxes.
+	 * }
+	 * @return void
+	 */
+	public function __construct( array $options = array() ) {
+		if ( isset( $options['prefer_packets'] ) ) {
+			$this->prefer_packets = $options['prefer_packets'];
+		}
+		include_once( 'class-wc-boxpack-box.php' );
+		include_once( 'class-wc-boxpack-item.php' );
+	}
 
-    /**
-     * clear_boxes function.
-     *
-     * @access public
-     * @return void
-     */
-    public function clear_boxes()
-    {
-        $this->boxes = [];
-    }
+	/**
+	 * clear_items function.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function clear_items() {
+		$this->items = array();
+	}
 
-    /**
-     * add_item function.
-     *
-     * @access public
-     * @return void
-     */
-    public function add_item($length, $width, $height, $weight, $value = '', $meta = [])
-    {
-        $this->items[] = new WC_Boxpack_Item($length, $width, $height, $weight, $value, $meta);
-    }
+	/**
+	 * clear_boxes function.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function clear_boxes() {
+		$this->boxes = array();
+	}
 
-    /**
-     * add_box function.
-     *
-     * @param  mixed   $length
-     * @param  mixed   $width
-     * @param  mixed   $height
-     * @param  mixed   $weight
-     * @param  float   $max_weight
-     * @param  string  $type
-     *
-     * @return WC_Boxpack_Box
-     * @since 1.0.2 Add `$max_weight` and `$type` optional parameters.
-     *
-     */
-    public function add_box($length, $width, $height, $weight = 0, $max_weight = 0.0, $type = '')
-    {
-        $new_box = new WC_Boxpack_Box($length, $width, $height, $weight, $max_weight, $type);
-        $this->boxes[] = $new_box;
-        return $new_box;
-    }
+	/**
+	 * add_item function.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function add_item( $length, $width, $height, $weight, $value = '', $meta = array() ) {
+		$this->items[] = new WC_Boxpack_Item( $length, $width, $height, $weight, $value, $meta );
+	}
 
-    /**
-     * get_packages function.
-     *
-     * @access public
-     * @return array
-     */
-    public function get_packages()
-    {
-        return $this->packages ? $this->packages : [];
-    }
+	/**
+	 * add_box function.
+	 *
+	 * @since 1.0.2 Add `$max_weight` and `$type` optional parameters.
+	 *
+	 * @param mixed $length
+	 * @param mixed $width
+	 * @param mixed $height
+	 * @param mixed $weight
+	 * @param float $max_weight
+	 * @param string $type
+	 *
+	 * @return WC_Boxpack_Box
+	 */
+	public function add_box( $length, $width, $height, $weight = 0, $max_weight = 0.0, $type = '' ) {
+		$new_box       = new WC_Boxpack_Box( $length, $width, $height, $weight, $max_weight, $type );
+		$this->boxes[] = $new_box;
+		return $new_box;
+	}
 
-    /**
-     * pack function.
-     *
-     * @access public
-     * @return void
-     */
-    public function pack()
-    {
-        try {
-            // We need items
-            if (sizeof($this->items) == 0) {
-                throw new Exception('No items to pack!');
-            }
+	/**
+	 * get_packages function.
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function get_packages() {
+		return $this->packages ? $this->packages : array();
+	}
 
-            // Clear packages
-            $this->packages = [];
+	/**
+	 * pack function.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function pack() {
+		try {
+			// We need items
+			if ( sizeof( $this->items ) == 0 ) {
+				throw new Exception( 'No items to pack!' );
+			}
 
-            // Order the boxes by volume
-            $this->boxes = $this->order_boxes($this->boxes);
+			// Clear packages
+			$this->packages = array();
 
-            if (!$this->boxes) {
-                $this->cannot_pack = $this->items;
-                $this->items = [];
-            }
+			// Order the boxes by volume
+			$this->boxes = $this->order_boxes( $this->boxes );
 
-            // Keep looping until packed
-            while (sizeof($this->items) > 0) {
-                $this->items = $this->order_items($this->items);
-                $possible_packages = [];
-                $best_package = '';
+			if ( ! $this->boxes ) {
+				$this->cannot_pack = $this->items;
+				$this->items       = array();
+			}
 
-                // Attempt to pack all items in each box
-                foreach ($this->boxes as $box) {
-                    $possible_packages[] = $box->pack($this->items);
-                }
+			// Keep looping until packed
+			while ( sizeof( $this->items ) > 0 ) {
+				$this->items       = $this->order_items( $this->items );
+				$possible_packages = array();
+				$best_package      = '';
 
-                // Find the best success rate
-                $best_percent = 0;
+				// Attempt to pack all items in each box
+				foreach ( $this->boxes as $box ) {
+					$possible_packages[] = $box->pack( $this->items );
+				}
 
-                foreach ($possible_packages as $package) {
-                    if ($package->percent > $best_percent) {
-                        $best_percent = $package->percent;
-                    }
-                }
+				// Find the best success rate
+				$best_percent = 0;
 
-                if ($best_percent == 0) {
-                    $this->cannot_pack = $this->items;
-                    $this->items = [];
-                } else {
-                    // Get smallest box with best_percent
-                    $possible_packages = array_reverse($possible_packages);
+				foreach ( $possible_packages as $package ) {
+					if ( $package->percent > $best_percent ) {
+						$best_percent = $package->percent;
+					}
+				}
 
-                    foreach ($possible_packages as $package) {
-                        if ($package->percent == $best_percent) {
-                            $best_package = $package;
-                            break; // Done packing
-                        }
-                    }
+				if ( $best_percent == 0 ) {
+					$this->cannot_pack = $this->items;
+					$this->items       = array();
+				} else {
+					// Get smallest box with best_percent
+					$possible_packages = array_reverse( $possible_packages );
 
-                    // Update items array
-                    $this->items = $best_package->unpacked;
+					foreach ( $possible_packages as $package ) {
+						if ( $package->percent == $best_percent ) {
+							$best_package = $package;
+							break; // Done packing
+						}
+					}
 
-                    // Store package
-                    $this->packages[] = $best_package;
-                }
-            }
+					// Update items array
+					$this->items = $best_package->unpacked;
 
-            // Items we cannot pack (by now) get packaged individually
-            if ($this->cannot_pack) {
-                foreach ($this->cannot_pack as $item) {
-                    $package = new stdClass();
-                    $package->id = '';
-                    $package->type = 'box';
-                    $package->weight = $item->get_weight();
-                    $package->length = $item->get_length();
-                    $package->width = $item->get_width();
-                    $package->height = $item->get_height();
-                    $package->value = $item->get_value();
-                    $package->unpacked = true;
-                    $this->packages[] = $package;
-                }
-            }
-        } catch (Exception $e) {
-            // Display a packing error for admins
-            if (current_user_can('manage_options')) {
-                echo 'Packing error: ', $e->getMessage(), "\n";
-            }
-        }
-    }
+					// Store package
+					$this->packages[] = $best_package;
+				}
+			}
 
-    /**
-     * Order boxes by weight and volume
-     * $param array $sort
-     *
-     * @return array
-     */
-    private function order_boxes($sort)
-    {
-        if (!empty($sort)) {
-            uasort($sort, [$this, 'box_sorting']);
-        }
-        return $sort;
-    }
+			// Items we cannot pack (by now) get packaged individually
+			if ( $this->cannot_pack ) {
+				foreach ( $this->cannot_pack as $item ) {
+					$package           = new stdClass();
+					$package->id       = '';
+					$package->type     = 'box';
+					$package->weight   = $item->get_weight();
+					$package->length   = $item->get_length();
+					$package->width    = $item->get_width();
+					$package->height   = $item->get_height();
+					$package->value    = $item->get_value();
+					$package->unpacked = true;
+					$this->packages[]  = $package;
+				}
+			}
+		} catch ( Exception $e ) {
 
-    /**
-     * Order items by weight and volume
-     * $param array $sort
-     *
-     * @return array
-     */
-    private function order_items($sort)
-    {
-        if (!empty($sort)) {
-            uasort($sort, [$this, 'item_sorting']);
-        }
-        return $sort;
-    }
+			// Display a packing error for admins
+			if ( current_user_can( 'manage_options' ) ) {
+				echo 'Packing error: ',  $e->getMessage(), "\n";
+			}
+		}
+	}
 
-    /**
-     * item_sorting function.
-     *
-     * @access public
-     *
-     * @param  mixed  $a
-     * @param  mixed  $b
-     *
-     * @return int
-     */
-    public function item_sorting($a, $b)
-    {
-        if ($a->get_volume() == $b->get_volume()) {
-            if ($a->get_weight() == $b->get_weight()) {
-                return 0;
-            }
-            return ($a->get_weight() < $b->get_weight()) ? 1 : -1;
-        }
-        return ($a->get_volume() < $b->get_volume()) ? 1 : -1;
-    }
+	/**
+	 * Order boxes by weight and volume
+	 * $param array $sort
+	 * @return array
+	 */
+	private function order_boxes( $sort ) {
+		if ( ! empty( $sort ) ) {
+			uasort( $sort, array( $this, 'box_sorting' ) );
+		}
+		return $sort;
+	}
 
-    /**
-     * box_sorting function.
-     *
-     * @access public
-     *
-     * @param  mixed  $a
-     * @param  mixed  $b
-     *
-     * @return int
-     */
-    public function box_sorting($a, $b)
-    {
-        if ($this->prefer_packets) {
-            // check 'envelope', 'packet' first as they are cheaper even if their volume is more
-            $a_cheaper_packaging = in_array($a->get_type(), ['envelope', 'packet']);
-            $b_cheaper_packaging = in_array($b->get_type(), ['envelope', 'packet']);
+	/**
+	 * Order items by weight and volume
+	 * $param array $sort
+	 * @return array
+	 */
+	private function order_items( $sort ) {
+		if ( ! empty( $sort ) ) {
+			uasort( $sort, array( $this, 'item_sorting' ) );
+		}
+		return $sort;
+	}
 
-            if ($a_cheaper_packaging && !$b_cheaper_packaging) {
-                return 1;
-            }
+	/**
+	 * item_sorting function.
+	 *
+	 * @access public
+	 * @param mixed $a
+	 * @param mixed $b
+	 * @return int
+	 */
+	public function item_sorting( $a, $b ) {
+		if ( $a->get_volume() == $b->get_volume() ) {
+			if ( $a->get_weight() == $b->get_weight() ) {
+				return 0;
+			}
+			return ( $a->get_weight() < $b->get_weight() ) ? 1 : -1;
+		}
+		return ( $a->get_volume() < $b->get_volume() ) ? 1 : -1;
+	}
 
-            if ($b_cheaper_packaging && !$a_cheaper_packaging) {
-                return -1;
-            }
-        }
+	/**
+	 * box_sorting function.
+	 *
+	 * @access public
+	 * @param mixed $a
+	 * @param mixed $b
+	 * @return int
+	 */
+	public function box_sorting( $a, $b ) {
 
-        if ($a->get_volume() == $b->get_volume()) {
-            if ($a->get_max_weight() == $b->get_max_weight()) {
-                return 0;
-            }
-            return ($a->get_max_weight() < $b->get_max_weight()) ? 1 : -1;
-        }
-        return ($a->get_volume() < $b->get_volume()) ? 1 : -1;
-    }
+		if ( $this->prefer_packets ) {
+			// check 'envelope', 'packet' first as they are cheaper even if their volume is more
+			$a_cheaper_packaging = in_array( $a->get_type(), array( 'envelope', 'packet' ) );
+			$b_cheaper_packaging = in_array( $b->get_type(), array( 'envelope', 'packet' ) );
+
+			if ( $a_cheaper_packaging && ! $b_cheaper_packaging ) {
+				return 1;
+			}
+
+			if ( $b_cheaper_packaging && ! $a_cheaper_packaging ) {
+				return - 1;
+			}
+		}
+
+		if ( $a->get_volume() == $b->get_volume() ) {
+			if ( $a->get_max_weight() == $b->get_max_weight() ) {
+				return 0;
+			}
+			return ( $a->get_max_weight() < $b->get_max_weight() ) ? 1 : -1;
+		}
+		return ( $a->get_volume() < $b->get_volume() ) ? 1 : -1;
+	}
 }

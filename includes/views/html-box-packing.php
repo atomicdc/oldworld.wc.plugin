@@ -35,7 +35,6 @@
                 cursor: move;
                 width: 16px;
                 padding: 0 16px;
-                cursor: move;
                 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAHUlEQVQYV2O8f//+fwY8gJGgAny6QXKETRgEVgAAXxAVsa5Xr3QAAAAASUVORK5CYII=) no-repeat center;
             }
         </style>
@@ -43,7 +42,7 @@
         <table class="freight_boxes widefat">
             <thead>
                 <tr>
-                    <th class="check-column"><input type="checkbox"/></th>
+                    <th class="check-column"><input type="checkbox" /></th>
                     <th><?php _e('Name', 'woocommerce-shipping-freight'); ?></th>
                     <th><?php _e('Length', 'woocommerce-shipping-freight'); ?></th>
                     <th><?php _e('Width', 'woocommerce-shipping-freight'); ?></th>
@@ -57,13 +56,17 @@
 
                 <tr>
                     <th colspan="3">
-                        <a href="#" class="button plus insert"><?php _e('Add Box', 'woocommerce-shipping-freight'); ?></a>
-                        <a href="#" class="button minus remove"><?php _e('Remove selected box(es)', 'woocommerce-shipping-freight'); ?></a>
+                        <a href="#" class="button plus insert">
+                            <?php _e('Add Box', 'woocommerce-shipping-freight'); ?>
+                        </a>
+                        <a href="#" class="button minus remove">
+                            <?php _e('Remove selected box(es)', 'woocommerce-shipping-freight'); ?>
+                        </a>
                     </th>
 
                     <th colspan="6">
                         <small class="description">
-                            <?php _e('Items will be packed into these boxes depending based on item dimensions and volume. Dimensions will be passed to Freight Shipping and used for packing. Items not fitting into boxes will be packed individually.', 'woocommerce-shipping-freight'); ?>
+                            <?php _e('Items will be packed into these boxes depending based on item dimensions and volume. <br />Dimensions will be passed to Freight Shipping and used for packing. <br />Items not fitting into boxes will be packed individually.', 'woocommerce-shipping-freight'); ?>
                         </small>
                     </th>
                 </tr>
@@ -74,8 +77,7 @@
                 <?php
                 if ($this->default_boxes):
                     foreach ($this->default_boxes as $key => $box):
-                        $checked = checked(!isset($this->boxes[$box['id']]['enabled']) || $this->boxes[$box['id']]['enabled'] == 1, true); ?>
-
+                        $checked = checked(isset($this->boxes[$box['id']]['enabled']), true, false); ?>
                         <tr>
                             <td class="check-column"></td>
                             <td><?= $box['name']; ?></td>
@@ -83,7 +85,7 @@
                             <td><input type="text" size="5" readonly value="<?= esc_attr($box['width']); ?>"/>in</td>
                             <td><input type="text" size="5" readonly value="<?= esc_attr($box['height']); ?>"/>in</td>
                             <td><input type="text" size="5" readonly value="<?= esc_attr($box['box_weight']); ?>"/>lbs</td>
-                            <td><input type="text" size="5" readonly value="<?=esc_attr($box['max_weight']); ?>"/>lbs</td>
+                            <td><input type="text" size="5" readonly value="<?= esc_attr($box['max_weight']); ?>"/>lbs</td>
                             <td><input type="checkbox" name="boxes_enabled[<?= $box['id']; ?>]" <?= $checked; ?> /></td>
                         </tr>
 
@@ -97,13 +99,13 @@
                         if (!is_numeric($key)):
                             continue;
                         endif;
-                        $checked = checked($box['enabled'], true); ?>
+                        $checked = checked($box['enabled'], true, false); ?>
 
                         <tr>
                             <td class="check-column"><input type="checkbox"/></td>
                             <td><input type="text" size="10"
                                        name="boxes_name[<?= $key; ?>]"
-                                       value="<?= isset($box['name']) ? esc_attr($box['name']) : null; ?>" />
+                                       value="<?= esc_attr($box['name']) ?? null; ?>" />
                             </td>
                             <td><input type="text" size="5"
                                        name="boxes_length[<?= $key; ?>]"
@@ -158,7 +160,8 @@
                 jQuery('.freight_boxes .insert').click(function () {
                     var $tbody = jQuery('.freight_boxes').find('tbody');
                     var size = $tbody.find('tr').size();
-                    var code = '<tr class="new">\
+                    var code = '\
+                        <tr class="new">\
 							<td class="check-column"><input type="checkbox" /></td>\
 							<td><input type="text" size="10" name="boxes_name[' + size + ']" /></td>\
 							<td><input type="text" size="5" name="boxes_length[' + size + ']" />in</td>\
@@ -205,6 +208,13 @@
                         jQuery('input.order', el).val(parseInt(jQuery(el).index('.freight_services tr')));
                     });
                 }
+
+                function manuallyChecked () {
+                    var checkbox = jQuery('.manuallyChecked');
+                    if (checkbox.prop('disabled') && !checkbox.is(':checked'))
+                        checkbox.prop('checked', true);
+                }
+                manuallyChecked();
             });
         </script>
     </td>
