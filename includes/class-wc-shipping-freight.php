@@ -1,8 +1,7 @@
 <?php
 
-if (!defined('ABSPATH')) {
+if (!defined('ABSPATH'))
     exit;
-}
 
 /**
  * Shipping Freight Core
@@ -15,6 +14,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     private $found_rates;
     private $services;
     private $orderCount = 0;
+    private $noShippingProducts;
 
     public function __construct($instance_id = 0)
     {
@@ -135,7 +135,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     public function debug($message, $type = 'notice')
     {
-        if ($this->debug || (current_user_can('manage_options') && 'error' == $type)) {
+        if ($this->debug || (current_user_can('manage_options') && 'error' === $type)) {
             wc_add_notice($message, $type);
         }
     }
@@ -158,6 +158,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'type' => 'checkbox',
                 'default' => 'yes',
             ],
+
             'api' => [
                 'title' => __('API Settings', 'woocommerce-shipping-freight'),
                 'type' => 'title',
@@ -371,6 +372,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'enabled' => isset($boxes_enabled[$box['id']]) ? true : false,
             ];
         }
+
         return $boxes;
     }
 
@@ -421,7 +423,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Get the freight class
      *
-     * @param  int  $shipping_class_id
+     * @param   int     $shipping_class_id
      * @return  string
      * @since   2.0.0
      */
@@ -429,13 +431,27 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     {
         $class = get_term_meta($shipping_class_id, 'freight_class', true);
 
-        return $class ?? null;
+        return $class ?? false;
+    }
+
+    public function no_shipping_notice()
+    {
+        if (isset($this->noShippingProducts) && is_array($this->noShippingProducts)) {
+            foreach ($this->noShippingProducts as $product) {
+                echo '
+                    <ul class="woocommerce-error" role="alert">
+                        <li>The product <strong>'.$product->get_title().'</strong> cannot be shipped and is not included in shipping pricing. Please contact us for details.</li>
+                    </ul>
+                ';
+            }
+        }
+
     }
 
     /**
      * Pack items individually.
      *
-     * @param  mixed  $package  Package to ship.
+     * @param   mixed  $package  Package to ship.
      * @return  mixed
      * @since   2.0.0
      */
@@ -448,16 +464,39 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             if (!$values['data']->needs_shipping()) {
                 $this->debug(sprintf(__('Product # is virtual. Skipping.', 'woocommerce-shipping-freight'),
                     $item_id), 'notice');
+
                 continue;
             }
 
             if (!$values['data']->get_weight()) {
-                $this->debug(sprintf(__('Product # is missing weight. Aborting.', 'woocommerce-shipping-freight'),
+                $productId = $values['data']->get_parent_id();
+
+                $this->debug(sprintf(__('Product <strong>'.$values['data']->get_title().' : %s</strong> is missing weight.', 'woocommerce-shipping-freight'),
                     $item_id), 'error');
-                return;
+
+                $this->noShippingProducts[] = $values['data'];
+
+                add_action('woocommerce_after_cart_table', [$this, 'no_shipping_notice'], 10, 0);
+
+                continue;
             }
 
-            $group = [];
+            if (!$values['data']->get_length() || !$values['data']->get_width() || $values['data']->get_height()) {
+                $productId = $values['data']->get_parent_id();
+
+                $this->debug(sprintf(__('Product <strong>'.$values['data']->get_title().' : %s</strong> is length, width or height.',
+                    'woocommerce-shipping-freight'),
+                    $item_id), 'error');
+
+                $this->noShippingProducts[] = $values['data'];
+
+                add_action('woocommerce_after_cart_table', [$this, 'no_shipping_notice'], 10, 0);
+
+                continue;
+            }
+
+            //$group = [];
+
             $group = [
                 'GroupNumber' => $group_id,
                 'GroupPackageCount' => $values['quantity'],
@@ -489,11 +528,11 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Pack into boxes with weights and dimensions.
      *
-     * @param  mixed  $package  Package to ship.
-     * @return  array
+     * @param   mixed  $items  Package to ship.
+     * @return  mixed
      * @since   2.0.0
      */
-    private function box_shipping($package)
+    private function box_shipping($items)
     {
         if (!class_exists('WC_Boxpack')) {
             include_once 'box-packer/class-wc-boxpack.php';
@@ -530,9 +569,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         }
 
         // Add items.
-        foreach ($package['contents'] as $item_id => $values) {
+        foreach ($items['contents'] as $item_id => $values) {
             if (!$values['data']->needs_shipping()) {
                 $this->debug(sprintf(__('Product # is virtual. Skipping.', 'woocommerce-shipping-freight'), $item_id), 'notice');
+
                 continue;
             }
 
@@ -549,7 +589,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 }
             } else {
                 $this->debug(sprintf(__('Product #%s is missing dimensions. Aborting.', 'woocommerce-shipping-freight'), $item_id), 'error');
-                return;
+
+                return false;
             }
         }
 
@@ -608,6 +649,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             $to_ship[] = $group;
             $group_id++;
         }
+
         return $to_ship;
     }
 
@@ -700,8 +742,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     private function get_freight_api_request($package)
     {
         $data = $package;
+        $item = $data;
 
-        // Drop in arbitrary delivery dates since we just need a quote.
+        // Drop in arbitrary delivery dates since we just need a basic quote.
         if (!array_key_exists('DropDate', $data)) {
             $data['DropDate'] = (new DateTime('tomorrow'))->format('m/d/Y H:i');
         }
@@ -712,7 +755,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         $this->writer = new XMLWriter;
 
-        // Arbitrary just for quotes.
+        // Arbitrary for quote.
         $sServiceFlagPickup = 'LGDC';
         $sServiceFlagDelivery = 'RSDC';
         $sMode = 'LTL';
@@ -755,26 +798,27 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         $this->writer->startElement('Items');
 
-        foreach ($this->package['contents'] as $k => $v):
-            $item = $v['data']->get_parent_data();
 
+        //foreach ($package as $item):
+            //$item = $value['data']->get_parent_data();
             $this->writer->startElement('Item');
             $this->writer->writeAttribute('sequence', '1');
             $this->writer->writeAttribute('freightClass', $this->freight_class);
 
             $this->writer->startElement('Weight');
             $this->writer->writeAttribute('units', 'lb');
-            $this->writer->text($item['weight']);
+            $this->writer->text($item['Weight']['Value']);
             $this->writer->endElement();
 
             $this->writer->startElement('Dimensions');
-            $this->writer->writeAttribute('length', $item['length']);
-            $this->writer->writeAttribute('width', $item['width']);
-            $this->writer->writeAttribute('height', $item['height']);
+            $this->writer->writeAttribute('length', $item['Dimensions']['Length'] ?? 0);
+            $this->writer->writeAttribute('width', $item['Dimensions']['Width'] ?? 0);
+            $this->writer->writeAttribute('height', $item['Dimensions']['Height'] ?? 0);
             $this->writer->writeAttribute('units', 'inches');
             $this->writer->endElement();
             $this->writer->endElement();
-        endforeach;
+        //endforeach;
+
         $this->writer->endElement();
 
         $this->writer->startElement('Events');
@@ -811,9 +855,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         $payload = $this->writer->outputMemory(true);
 
-        $this->debug('FREIGHT SHIPPING REQUEST (get_freight_api_request): <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r('Date/Time: '.date('Y-m-d H:i:s').'<br />API endpoint: '.$this->api_url.'<br />Payload: '.$payload, true).'</pre>');
+        $this->debug('FREIGHT SHIPPING REQUEST (get_freight_api_request:820): <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r('Date/Time: '.date('Y-m-d H:i:s').'<br />API endpoint: '.$this->api_url.'<br />Payload: '.$payload, true).'</pre>');
 
-        //return $result;
         return apply_filters('woocommerce_freight_api_request', $payload);
     }
 
@@ -821,7 +864,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * Retrieve the friend API request
      *
      * @param  $package array  The package passed from WooCommerce
-     * @return array
+     * @return mixed
      * @since 2.0.0
      */
     private function get_freight_requests($package)
@@ -848,17 +891,24 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         /*$this->residential_address_validation($package);*/
 
         $freight_packages = $this->get_freight_packages($package);
-        $freight_requests = $this->get_freight_requests($freight_packages, $package);
 
-        if ($freight_requests) {
-            $this->run_package_request($freight_requests);
+        foreach ($freight_packages as $freight_package) {
+            $freight_requests = $this->get_freight_requests($freight_package);
+
+            if ($freight_requests) {
+                if (!$this->run_package_request($freight_requests)) {
+                    $this->noShippingProducts[] = $freight_package['packed_products'][0];
+
+                    add_action('woocommerce_after_cart_table', [$this, 'no_shipping_notice'], 10, 0);
+                }
+            }
         }
 
         /*if ($this->freight_enabled && ($freight_requests = $this->get_freight_requests($freight_packages, $package, 'freight'))) {
             $this->run_package_request($freight_requests);
         }*/
 
-        $packages_to_quote_count = count($freight_requests);
+        $packages_to_quote_count = is_countable($freight_requests) ? count($freight_requests) : 1;
 
         if ($this->found_rates) {
             foreach ($this->found_rates as $key => $value) {
@@ -874,9 +924,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
                     foreach ($freight_packages as $freight_package) {
                         $meta_data['Package '.$freight_package['GroupNumber']] = $this->get_rate_meta_data([
-                            'length' => $freight_package['Dimensions']['Length'],
-                            'width' => $freight_package['Dimensions']['Width'],
-                            'height' => $freight_package['Dimensions']['Height'],
+                            'length' => $freight_package['Dimensions']['Length'] ?? 0,
+                            'width' => $freight_package['Dimensions']['Width'] ?? 0,
+                            'height' => $freight_package['Dimensions']['Height'] ?? 0,
                             'weight' => $freight_package['Weight']['Value'],
                             'qty' => $freight_package['GroupPackageCount'],
                         ]);
@@ -898,13 +948,17 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     public function run_package_request($requests)
     {
         try {
-            if (is_array($requests)) {
+            /*if (is_array($requests)) {
                 foreach ($requests as $request) {
-                    $this->process_result($this->get_result($request));
+                    if (!$this->process_result($this->get_result($request))) {
+                        $this->noShippingProducts[] = $request['data'];
+
+                        add_action('woocommerce_after_cart_table', [$this, 'no_shipping_notice'], 10, 0);
+                    }
                 }
-            } else {
-                $this->process_result($this->get_result($requests));
-            }
+            } else {*/
+            return $this->process_result($this->get_result($requests)) ? true : false;
+            //}
         } catch (Exception $e) {
             $this->debug(print_r($e, true), 'error');
 
@@ -930,9 +984,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 'request' => $request,
             ];
 
-            $request['TransactionDetail'] = [
+            /*$request['TransactionDetail'] = [
                 'CustomerTransactionId' => ' *** WooCommerce Rate Request ***',
-            ];
+            ];*/
 
             $options = [
                 'http' => [
@@ -954,10 +1008,12 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             $result = simplexml_load_string($rates);
 
         } catch (Exception $e) {
-            $this->debug('EXCEPTION: '.$e->getMessage().'<a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r([$data, $options, $response, $rates, $result], true).'</pre>');
+            $this->debug('EXCEPTION (963) : '.$e->getMessage().'<a href="#" class="debug_reveal">Reveal</a>
+                <pre class="debug_info">'.print_r([$data, $options, $response], true).'</pre>');
         }
 
-        $this->debug('FREIGHT SHIPPING RESPONSE: <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r($result, true).'</pre>');
+        $this->debug('FREIGHT SHIPPING RESPONSE (967) : <a href="#" class="debug_reveal">Reveal</a>
+            <pre class="debug_info">Freight Total + '.print_r($result, true).'</pre>');
 
         wc_enqueue_js("
 			jQuery('a.debug_reveal').on('click', function(){
@@ -976,13 +1032,14 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * (Mostly just hand-off, as is. Use as needed)
      *
      * @param  mixed  $result
-     * @return void
+     * @return mixed
      * @since  2.0.0
      */
     private function process_result($result)
     {
-        if (!$result->StatusCode) {
-            $this->debug('FREIGHT SHIPPING RESPONSE (STATUSCODE NOT ZERO) :  <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r($result, true).'</pre>');
+        if (!$result->StatusCode || (int) $result->StatusCode !== 0 || !$result->PriceSheets->PriceSheet->Service) {
+            $this->debug('STATUS CODE NOT ZERO: <a href="#" class="debug_reveal">Reveal</a>
+                <pre class="debug_info">'.print_r($result, true).'</pre>');
 
             wc_enqueue_js("
                 jQuery('a.debug_reveal').on('click', function(){
@@ -992,12 +1049,12 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 });
                 jQuery('pre.debug_info').hide();
 		    ");
-            return;
+            return false;
         }
 
         $PriceSheets = $result->PriceSheets;
 
-        $this->prepare_rate($PriceSheets->PriceSheet->Total, $PriceSheets->PriceSheet->Service);
+        return $this->prepare_rate($PriceSheets->PriceSheet->Total, $PriceSheets->PriceSheet->Service ?? false) ? true : false;
     }
 
     /**
@@ -1009,10 +1066,13 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     private function prepare_rate($total, $service)
     {
+
         $service = (string) $service;
 
-        if (!empty($this->services[$service]['name'])) {
+        if (isset($this->services[$service]['name']) && !empty($this->services[$service]['name'])) {
             $rate_name = $this->services[$service]['name'];
+        } else {
+
         }
 
         if (!empty($this->services[$service]['adjustment_percent'])) {
@@ -1024,11 +1084,11 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         }
 
         if (isset($this->services[$service]) && empty($this->services[$service]['enabled'])) {
-            return;
+            return false;
         }
 
-        $rate_cost = $total + $this->found_rates[$service]['cost'];
-        $packages = 1 + $this->found_rates[$service]['packages'];
+        $rate_cost = $total + ($this->found_rates[$service]['cost'] ?? 0);
+        $packages = 1 + ($this->found_rates[$service]['packages'] ?? 0);
 
         return $this->found_rates[$service] = [
             'id' => $service,
@@ -1042,8 +1102,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Get meta data string for the shipping rate.
      *
-     * @param  array  $params  Meta data info to join.
-     * @return  string  Rate meta data.
+     * @param   array  $params  Meta data info to join.
+     * @return  string          Rate meta data.
      * @since   2.0.0
      */
     private function get_rate_meta_data($params)

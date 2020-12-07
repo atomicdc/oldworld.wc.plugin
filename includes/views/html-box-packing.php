@@ -78,6 +78,7 @@
                 if ($this->default_boxes):
                     foreach ($this->default_boxes as $key => $box):
                         $checked = checked(isset($this->boxes[$box['id']]['enabled']), true, false); ?>
+
                         <tr>
                             <td class="check-column"></td>
                             <td><?= $box['name']; ?></td>
@@ -99,34 +100,17 @@
                         if (!is_numeric($key)):
                             continue;
                         endif;
+
                         $checked = checked($box['enabled'], true, false); ?>
 
                         <tr>
                             <td class="check-column"><input type="checkbox"/></td>
-                            <td><input type="text" size="10"
-                                       name="boxes_name[<?= $key; ?>]"
-                                       value="<?= esc_attr($box['name']) ?? null; ?>" />
-                            </td>
-                            <td><input type="text" size="5"
-                                       name="boxes_length[<?= $key; ?>]"
-                                       value="<?= esc_attr($box['length']); ?>"/>in
-                            </td>
-                            <td><input type="text" size="5"
-                                       name="boxes_width[<?=$key; ?>]"
-                                       value="<?= esc_attr($box['width']); ?>"/>in
-                            </td>
-                            <td><input type="text" size="5"
-                                       name="boxes_height[<?= $key; ?>]"
-                                       value="<?= esc_attr($box['height']); ?>"/>in
-                            </td>
-                            <td><input type="text" size="5"
-                                       name="boxes_box_weight[<?= $key; ?>]"
-                                       value="<?= esc_attr($box['box_weight']); ?>"/>lbs
-                            </td>
-                            <td><input type="text" size="5"
-                                       name="boxes_max_weight[<?= $key; ?>]"
-                                       value="<?= esc_attr($box['max_weight']); ?>"/>lbs
-                            </td>
+                            <td><input type="text" size="10" name="boxes_name[<?= $key; ?>]" value="<?= esc_attr($box['name']) ?? null; ?>" /></td>
+                            <td><input type="text" size="5" name="boxes_length[<?= $key; ?>]" value="<?= esc_attr($box['length']); ?>"/>in</td>
+                            <td><input type="text" size="5" name="boxes_width[<?= $key; ?>]" value="<?= esc_attr($box['width']); ?>"/>in</td>
+                            <td><input type="text" size="5" name="boxes_height[<?= $key; ?>]" value="<?= esc_attr($box['height']); ?>"/>in</td>
+                            <td><input type="text" size="5" name="boxes_box_weight[<?= $key; ?>]" value="<?= esc_attr($box['box_weight']); ?>"/>lbs</td>
+                            <td><input type="text" size="5" name="boxes_max_weight[<?= $key; ?>]" value="<?= esc_attr($box['max_weight']); ?>"/>lbs</td>
                             <td><input type="checkbox" name="boxes_enabled[<?= $key; ?>]" <?= $checked; ?> /></td>
                         </tr>
 
