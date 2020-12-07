@@ -12,7 +12,7 @@
  * Copyright: 2020 Atomic Design & Consulting
  */
 
-//require 'vendor/autoload.php';
+require 'vendor/autoload.php';
 
 if (!function_exists('woothemes_queue_update')) {
     require_once('woo-includes/woo-functions.php');
@@ -44,7 +44,8 @@ class WC_Shipping_Freight_Init
      */
     public static function get_instance()
     {
-        return null === self::$instance ? (self::$instance = new self) : self::$instance;
+        //return null === self::$instance ? (self::$instance = new self) : self::$instance;
+        return self::$instance ?? self::$instance = new self;
     }
 
     /**
@@ -141,9 +142,6 @@ class WC_Shipping_Freight_Init
         $plugin_links = [
             '<a href="'.admin_url('admin.php?page=wc-settings&tab=shipping&section=freight').'">'.__('Settings',
                 'woocommerce-shipping-freight').'</a>',
-            '<a href="https://atomicdc.com/">'.__('Support: atomicdc.com', 'woocommerce-shipping-freight').'</a>',
-            '<a href="https://docs.rubberduckydev.io/wordpress/plugin/freight-shipping/">'.__('Docs: rubberduckydev.io',
-                'woocommerce-shipping-freight').'</a>',
         ];
 
         return array_merge($plugin_links, $links);
@@ -221,6 +219,7 @@ class WC_Shipping_Freight_Init
     /**
      * Show the user a notice for plugin updates
      *
+     * @return void
      * @since 2.0.0
      */
     public function upgrade_notice()

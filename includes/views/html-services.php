@@ -35,8 +35,8 @@
 
                 foreach ($this->ordered_services as $value) {
                     $code = $value[0];
-                    $name = $value[1];
-                    $checked = checked(isset($name['enabled']), true, false); ?>
+                    $service = $value[1];
+                    $checked = checked(isset($service['enabled']), true, false); ?>
 
                     <tr>
                         <td class="sort">
@@ -47,8 +47,8 @@
                         <td><strong><?= $code; ?></strong></td>
 
                         <td>
-                            <input type="text" name="freight_service[<?= $code; ?>][name]" placeholder="<?= $name; ?>"
-                                   value="<?= $name['name'] ?? null; ?>" size="50" />
+                            <input type="text" name="freight_service[<?= $code; ?>][name]" placeholder="<?= $service['name']; ?>"
+                                   value="<?= $service['name'] ?? null; ?>" size="50" />
                         </td>
 
                         <td>
@@ -56,13 +56,13 @@
                         </td>
 
                         <td>
-                            <input type="text" name="freight_service[<?= $code; ?>][adjustment]" placeholder="N/A"
-                                   value="<?= $name['adjustment'] ?? null; ?>" size="4" />
+                            <input type="text" name="freight_service[<?= $code; ?>][adjustment]" placeholder="0"
+                                   value="<?= $service['adjustment'] ?? 0; ?>" size="4" />
                         </td>
 
                         <td>
-                            <input type="text" name="freight_service[<?= $code; ?>][adjustment_percent]" placeholder="N/A"
-                                   value="<?= $name['adjustment_percent'] ?? null; ?>" size="4" />
+                            <input type="text" name="freight_service[<?= $code; ?>][adjustment_percent]" placeholder="0"
+                                   value="<?= $service['adjustment_percent'] ?? 0; ?>" size="4" />
                         </td>
                     </tr><?php
                 } ?>
