@@ -12,11 +12,8 @@
  * Copyright: 2020 Atomic Design & Consulting
  */
 
-require 'vendor/autoload.php';
-
-if (!function_exists('woothemes_queue_update')) {
+if (!function_exists('woothemes_queue_update'))
     require_once('woo-includes/woo-functions.php');
-}
 
 define('WC_SHIPPING_FREIGHT_VERSION', '2.0.0');
 
@@ -44,7 +41,6 @@ class WC_Shipping_Freight_Init
      */
     public static function get_instance()
     {
-        //return null === self::$instance ? (self::$instance = new self) : self::$instance;
         return self::$instance ?? self::$instance = new self;
     }
 
@@ -65,12 +61,12 @@ class WC_Shipping_Freight_Init
 
             $freight_settings = get_option('woocommerce_freight_settings', []);
 
-            if (isset($freight_settings['freight_enabled']) && 'yes' === $freight_settings['freight_enabled']) {
+            if (isset($freight_settings['freight_enabled']) && $freight_settings['freight_enabled'] === 'yes') {
                 add_filter('woocommerce_shipping_calculator_enable_city', '__return_true');
 
-                if (is_admin()) {
+                /*if (is_admin()) {
                     include(__DIR__.'/includes/class-wc-freight-mapping.php');
-                }
+                }*/
             }
         } else {
             add_action('admin_notices', [$this, 'wc_deactivated']);
@@ -85,10 +81,12 @@ class WC_Shipping_Freight_Init
     public function environment_check()
     {
         if (get_woocommerce_currency() !== 'USD' || WC()->countries->get_base_country() !== 'US') {
-            echo '<div class="error">
-				<p>'.__('Freight Shipping requires that the WooCommerce currency is set to US Dollars and that the base country/region is set to United States.',
-                    'woocommerce-shipping-freight').'</p>
-			</div>';
+            echo '
+                <div class="error">
+                    <p>'.__('Freight Shipping requires that the WooCommerce currency is set to US Dollars and that the base country/region is set to United States.',
+                        'woocommerce-shipping-freight').'</p>
+                </div>
+            ';
         }
     }
 
@@ -140,8 +138,7 @@ class WC_Shipping_Freight_Init
     public function plugin_links($links)
     {
         $plugin_links = [
-            '<a href="'.admin_url('admin.php?page=wc-settings&tab=shipping&section=freight').'">'.__('Settings',
-                'woocommerce-shipping-freight').'</a>',
+            '<a href="'.admin_url('admin.php?page=wc-settings&tab=shipping&section=freight').'">'.__('Settings', 'woocommerce-shipping-freight').'</a>',
         ];
 
         return array_merge($plugin_links, $links);
@@ -185,6 +182,7 @@ class WC_Shipping_Freight_Init
             && version_compare(get_option('wc_freight_version'), '2.0.0', '<')) {
             $this->install();
         }
+
         return true;
     }
 
@@ -226,12 +224,12 @@ class WC_Shipping_Freight_Init
     {
         $show_notice = get_option('woocommerce_freight_show_upgrade_notice');
 
-        if ('yes' !== $show_notice) {
+        if ($show_notice !== 'yes')
             return;
-        }
 
         $query_args = ['page' => 'wc-settings', 'tab' => 'shipping'];
         $zones_admin_url = add_query_arg($query_args, get_admin_url().'admin.php');
+
         ?>
         <div class="notice notice-success is-dismissible wc-freight-notice">
             <p>
