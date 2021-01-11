@@ -203,7 +203,7 @@ class WC_Shipping_Freight_Init
             unset($freight_settings['countries']);
 
             if (!$this->is_zone_has_freight(0)) {
-                $wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->prefix}woocommerce_shipping_zone_methods ( zone_id, method_id, method_order, is_enabled ) VALUES ( %d, %s, %d, %d )",
+                $wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."woocommerce_shipping_zone_methods (zone_id, method_id, method_order, is_enabled) VALUES (%d, %s, %d, %d)",
                     0, 'freight', 1, 1));
 
                 $instance = $wpdb->insert_id;
@@ -267,7 +267,7 @@ class WC_Shipping_Freight_Init
     {
         global $wpdb;
 
-        return (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(instance_id) FROM {$wpdb->prefix}woocommerce_shipping_zone_methods WHERE method_id = 'freight' AND zone_id = %d",
+        return (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(instance_id) FROM ".$wpdb->prefix."woocommerce_shipping_zone_methods WHERE method_id = 'freight' AND zone_id = %d",
                 $zone_id)) > 0;
     }
 }

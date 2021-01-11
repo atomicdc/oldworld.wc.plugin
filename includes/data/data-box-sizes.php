@@ -1,18 +1,19 @@
 <?php
 
 /**
- * Add additional custom crate sizes and packaging here.
+ * Custom crate sizes or packaging.
  */
 
 return [
-    [
+    'crate' => [
         'name' => 'Crate',
         'id' => 'CRATE',
         'enabled' => true,
-        'max_weight' => 250,
-        'box_weight' => 0,
-        'length' => 1,
-        'width' => 1,
-        'height' => 1,
-    ]
+        'max_weight' => 0.00,
+        'box_weight' => null,
+        'length' => null,
+        'width' => null,
+        'height' => null,
+        'rate' => 0.00,
+    ],
 ];

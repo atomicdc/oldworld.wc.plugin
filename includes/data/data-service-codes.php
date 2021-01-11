@@ -14,10 +14,10 @@
          'adjustment_percent' => 0.00
      ],
 
-     'CRATE FEE' => [
+     'CRATE' => [
          'name' => 'Per Crate, when total weight is greater than 250',
          'enabled' => true,
-         'adjustment' => 250.00,
+         'adjustment' => 0.00,
          'adjustment_percent' => 0.00
      ],
  ];
