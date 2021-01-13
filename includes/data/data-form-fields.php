@@ -59,15 +59,6 @@ if (!defined('ABSPATH'))
             'default' => '',
         ],
 
-        /*'freight_class' => [
-            'title' => __('Default Freight Class', 'woocommerce-shipping-freight'),
-            'description' => sprintf(__('This is the default freight class for shipments. This can be overridden using <a href="%s">shipping classes</a>',
-                'woocommerce-shipping-freight'), $shipping_class_link),
-            'type' => 'select',
-            'default' => '50',
-            'options' => $freight_classes,
-        ],*/
-
         'debug' => [
             'title' => __('Debug Mode', 'woocommerce-shipping-freight'),
             'label' => __('Enable debug mode', 'woocommerce-shipping-freight'),
