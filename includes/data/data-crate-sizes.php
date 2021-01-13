@@ -5,15 +5,13 @@
  */
 
 return [
-    'crate' => [
         'name' => 'Crate',
         'id' => 'CRATE',
         'enabled' => true,
-        'max_weight' => 0.00,
-        'box_weight' => null,
+        'max_weight' => 500,
+        'crate_weight' => null,
         'length' => null,
         'width' => null,
         'height' => null,
-        'rate' => 0.00,
-    ],
+        'rate' => 250,
 ];
