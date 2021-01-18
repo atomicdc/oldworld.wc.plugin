@@ -161,8 +161,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      */
     public function init_form_fields()
     {
-        $this->instance_form_fields = include(__DIR__.'/data/data-settings.php');
-        $this->form_fields = include(__DIR__.'/data/data-form-fields.php');
+        $this->instance_form_fields = include __DIR__.'/data/data-settings.php';
+        $this->form_fields = include __DIR__.'/data/data-form-fields.php';
     }
 
     /**
@@ -235,11 +235,14 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                     'Value' => max('0.5', round(wc_get_weight($values['data']->get_weight(), 'lbs'), 2)),
                     'Units' => 'LB',
                 ],
-                //'packed_products' => [$values['data']],
             ];
 
             if ($values['data']->get_length() && $values['data']->get_height() && $values['data']->get_width()) {
-                $dimensions = [$values['data']->get_length(), $values['data']->get_width(), $values['data']->get_height()];
+                $dimensions = [
+                    $values['data']->get_length(),
+                    $values['data']->get_width(),
+                    $values['data']->get_height()
+                ];
 
                 sort($dimensions);
 
@@ -508,7 +511,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     private function process_result($result, $packages)
     {
         if (!$result->StatusCode || (int) $result->StatusCode !== 0 || !$result->PriceSheets->PriceSheet->Service) {
-
             $this->debug('STATUS CODE NOT ZERO: <a href="#" class="debug_reveal">Reveal</a>
                 <pre class="debug_info">'.print_r($result, true).'</pre>');
 
@@ -598,7 +600,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             }
 
             switch ($div = round($this->crates['max_weight'] / $weight, 2)) {
-                case $div <= 1:
+                case $div < 1:
+                    $crates += $item['Quantity'];
+                    break;
+                case $div == 1:
                     $crates += 1;
                     break;
                 case $div == 2:
