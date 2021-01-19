@@ -285,7 +285,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $sServiceFlagDelivery = 'RSDC';
         $sMode = 'LTL';
         $sFreightClass = '55';
-        $sCarrierName = 'OLD DOMINION FREIGHT LINE INC';
+        $sCarrierName = 'ESTES EXPRESS LINES';
 
         $this->writer->openMemory();
             $this->writer->startDocument();

@@ -7,8 +7,8 @@
  */
 
  return [
-     'ODFL BLANKET' => [
-         'name' => 'OLD DOMINION FREIGHT LINE INC',
+     'EXLS MASONRY BUY' => [
+         'name' => 'ESTES EXPRESS LINES',
          'enabled' => true,
          'adjustment' => 0.00,
          'adjustment_percent' => 0.00
