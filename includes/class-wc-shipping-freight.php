@@ -392,9 +392,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             <pre class="debug_info">API endpoint: '.$this->api_url.'<br />Payload: '.print_r(json_decode(json_encode(simplexml_load_string($payload)), true), true).'</pre>'
         );
 
-        //$array = json_decode(json_encode(simplexml_load_string($payload)), true);
-
-
         return apply_filters('woocommerce_freight_api_request', $payload);
     }
 
