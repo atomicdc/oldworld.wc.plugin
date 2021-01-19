@@ -284,7 +284,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $sServiceFlagPickup = 'LGDC';
         $sServiceFlagDelivery = 'RSDC';
         $sMode = 'LTL';
-        $sFreightClass = '55';
+        $sFreightClass = '60';
         $sCarrierName = 'ESTES EXPRESS LINES';
 
         $this->writer->openMemory();
@@ -318,7 +318,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                                     $this->writer->endElement();
                                 $this->writer->endElement();
 
-                                $this->writer->writeElement('Carrier', '');
+                                //$this->writer->writeElement('Carrier', '');
                                 $this->writer->writeElement('PaymentTerms', '');
 
                             $this->writer->endElement();
@@ -338,7 +338,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                                             $this->writer->writeAttribute('sequenceGroup', $product['GroupNumber']);
 
                                             $this->writer->startElement('Weight');
-                                                $this->writer->writeAttribute('units', 'lb');
+                                                $this->writer->writeAttribute('units', $product['Weight']['Units']); // old value: lb
                                                 $this->writer->text($product['Weight']['Value']);
                                             $this->writer->endElement();
 
@@ -346,7 +346,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                                                 $this->writer->writeAttribute('length', $product['Dimensions']['Length']);
                                                 $this->writer->writeAttribute('width', $product['Dimensions']['Width']);
                                                 $this->writer->writeAttribute('height', $product['Dimensions']['Height']);
-                                                $this->writer->writeAttribute('units', 'inches');
+                                                $this->writer->writeAttribute('units', $product['Dimensions']['Units']); // old value: inches
                                             $this->writer->endElement();
                                         $this->writer->endElement();
                                     }
@@ -388,7 +388,12 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         $payload = $this->writer->outputMemory(true);
 
-        $this->debug('FREIGHT SHIPPING REQUEST (get_freight_api_request:820): <a href="#" class="debug_reveal">Reveal</a><pre class="debug_info">'.print_r('Date/Time: '.date('Y-m-d H:i:s').'<br />API endpoint: '.$this->api_url.'<br />Payload: '.$payload, true).'</pre>');
+        $this->debug('FREIGHT SHIPPING REQUEST (get_freight_api_request:391): <a href="#" class="debug_reveal">Reveal</a>
+            <pre class="debug_info">API endpoint: '.$this->api_url.'<br />Payload: '.print_r(json_decode(json_encode(simplexml_load_string($payload)), true), true).'</pre>'
+        );
+
+        //$array = json_decode(json_encode(simplexml_load_string($payload)), true);
+
 
         return apply_filters('woocommerce_freight_api_request', $payload);
     }
