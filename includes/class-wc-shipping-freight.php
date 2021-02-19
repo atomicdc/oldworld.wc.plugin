@@ -284,8 +284,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $sServiceFlagPickup = 'LGDC';
         $sServiceFlagDelivery = 'RSDC';
         $sMode = 'LTL';
-        $sFreightClass = '60';
-        $sCarrierName = 'ESTES EXPRESS LINES';
+        $sFreightClass = '070';
+        $sCarrierName = 'OLD DOMINION FREIGHT LINE INC';
+        //$sCarrierName = 'ESTES EXPRESS LINES';
 
         $this->writer->openMemory();
             $this->writer->startDocument();
@@ -369,7 +370,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                                 $this->writer->startElement('Event');
                                     $this->writer->writeAttribute('sequence', 2);
                                     $this->writer->writeAttribute('type', 'Drop');
-                                    $this->writer->writeAttribute('date', $DropDate. "12:01");
+                                    $this->writer->writeAttribute('date', $DropDate);
 
                                     $this->writer->startElement('Location');
                                         $this->writer->writeElement('Zip', $this->package['destination']['postcode']);
@@ -387,10 +388,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             $this->writer->endDocument();
 
         $payload = $this->writer->outputMemory(true);
-
-        $this->debug('FREIGHT SHIPPING REQUEST (get_freight_api_request:391): <a href="#" class="debug_reveal">Reveal</a>
-            <pre class="debug_info">API endpoint: '.$this->api_url.'<br />Payload: '.print_r(json_decode(json_encode(simplexml_load_string($payload)), true), true).'</pre>'
-        );
 
         return apply_filters('woocommerce_freight_api_request', $payload);
     }
@@ -465,7 +462,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
             $options = [
                 'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'header' => "Content-type: application/x-www-form-urlencoded",
                     'method' => 'POST',
                     'content' => http_build_query($data),
                 ],

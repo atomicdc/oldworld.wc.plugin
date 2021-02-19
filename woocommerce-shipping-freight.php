@@ -28,7 +28,7 @@ class WC_Shipping_Freight_Init
     public $version;
 
     /**
-     * @var   object Class Instance
+     * @var object Class Instance
      * @since 2.0.0
      */
     private static $instance;
@@ -63,10 +63,6 @@ class WC_Shipping_Freight_Init
 
             if (isset($freight_settings['freight_enabled']) && $freight_settings['freight_enabled'] === 'yes') {
                 add_filter('woocommerce_shipping_calculator_enable_city', '__return_true');
-
-                /*if (is_admin()) {
-                    include(__DIR__.'/includes/class-wc-freight-mapping.php');
-                }*/
             }
         } else {
             add_action('admin_notices', [$this, 'wc_deactivated']);
