@@ -12,8 +12,9 @@
  * Copyright: 2020 Atomic Design & Consulting
  */
 
-if (!function_exists('woothemes_queue_update'))
+if (!function_exists('woothemes_queue_update')) {
     require_once('woo-includes/woo-functions.php');
+}
 
 define('WC_SHIPPING_FREIGHT_VERSION', '2.0.0');
 
@@ -41,7 +42,7 @@ class WC_Shipping_Freight_Init
      */
     public static function get_instance()
     {
-        return self::$instance ?? self::$instance = new self;
+        return self::$instance ?? self::$instance = new self();
     }
 
     /**
@@ -80,7 +81,7 @@ class WC_Shipping_Freight_Init
             echo '
                 <div class="error">
                     <p>'.__('Freight Shipping requires that the WooCommerce currency is set to US Dollars and that the base country/region is set to United States.',
-                        'woocommerce-shipping-freight').'</p>
+                    'woocommerce-shipping-freight').'</p>
                 </div>
             ';
         }
@@ -134,7 +135,8 @@ class WC_Shipping_Freight_Init
     public function plugin_links($links)
     {
         $plugin_links = [
-            '<a href="'.admin_url('admin.php?page=wc-settings&tab=shipping&section=freight').'">'.__('Settings', 'woocommerce-shipping-freight').'</a>',
+            '<a href="'.admin_url('admin.php?page=wc-settings&tab=shipping&section=freight').'">'.__('Settings',
+                'woocommerce-shipping-freight').'</a>',
         ];
 
         return array_merge($plugin_links, $links);
@@ -220,8 +222,9 @@ class WC_Shipping_Freight_Init
     {
         $show_notice = get_option('woocommerce_freight_show_upgrade_notice');
 
-        if ($show_notice !== 'yes')
+        if ($show_notice !== 'yes') {
             return;
+        }
 
         $query_args = ['page' => 'wc-settings', 'tab' => 'shipping'];
         $zones_admin_url = add_query_arg($query_args, get_admin_url().'admin.php');
@@ -229,7 +232,8 @@ class WC_Shipping_Freight_Init
         ?>
         <div class="notice notice-success is-dismissible wc-freight-notice">
             <p>
-                <?= sprintf(__('Freight Shipping supports shipping zones. The zone settings were added to a new Freight Shipping method on the "Rest of the World" Zone. See the zones %1$shere%2$s ', 'woocommerce-shipping-freight'), '<a href="'.$zones_admin_url.'">', '</a>'); ?>
+                <?= sprintf(__('Freight Shipping supports shipping zones. The zone settings were added to a new Freight Shipping method on the "Rest of the World" Zone. See the zones %1$shere%2$s ',
+                    'woocommerce-shipping-freight'), '<a href="'.$zones_admin_url.'">', '</a>'); ?>
             </p>
         </div>
 

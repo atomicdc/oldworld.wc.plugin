@@ -1,7 +1,8 @@
 <?php
 
-if (!defined('ABSPATH'))
+if (!defined('ABSPATH')) {
     exit;
+}
 
 $shipping_class_link = admin_url('admin.php?page=wc-settings&tab=shipping&section=classes');
 
