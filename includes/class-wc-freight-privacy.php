@@ -1,7 +1,8 @@
 <?php
 
-if (!class_exists('WC_Abstract_Privacy'))
+if (!class_exists('WC_Abstract_Privacy')) {
     return;
+}
 
 class WC_Freight_Privacy extends WC_Abstract_Privacy
 {

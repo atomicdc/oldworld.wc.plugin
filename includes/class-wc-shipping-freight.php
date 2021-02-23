@@ -1,7 +1,8 @@
 <?php
 
-if (!defined('ABSPATH'))
+if (!defined('ABSPATH')) {
     exit;
+}
 
 /**
  * Shipping Freight Core
@@ -24,7 +25,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $this->id = 'freight';
         $this->instance_id = absint($instance_id);
         $this->method_title = __('Freight Shipping', 'woocommerce-shipping-freight');
-        $this->method_description = __('The Freight Shipping extension obtains rates dynamically via API during cart/checkout.', 'woocommerce-shipping-freight');
+        $this->method_description = __('The Freight Shipping extension obtains rates dynamically via API during cart/checkout.',
+            'woocommerce-shipping-freight');
         $this->supports = ['shipping-zones', 'instance-settings', 'settings'];
 
         $this->crates = include(__DIR__.'/data/data-crate-sizes.php');
@@ -72,13 +74,15 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * See if destination qualifies for freight shipping
      *
      * @param  array  $package
+     *
      * @return  bool
      * @since   2.0.0
      */
     public function is_available($package)
     {
-        if (empty($package['destination']['country']))
+        if (empty($package['destination']['country'])) {
             return false;
+        }
 
         return apply_filters('woocommerce_shipping_'.$this->id.'_is_available', true, $package);
     }
@@ -92,8 +96,10 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     private function set_settings()
     {
         $this->title = $this->get_option('title', $this->method_title);
-        $this->origin = apply_filters('woocommerce_freight_origin_postal_code', str_replace(' ', '', strtoupper($this->get_option('origin'))));
-        $this->origin_country = apply_filters('woocommerce_freight_origin_country_code', WC()->countries->get_base_country());
+        $this->origin = apply_filters('woocommerce_freight_origin_postal_code',
+            str_replace(' ', '', strtoupper($this->get_option('origin'))));
+        $this->origin_country = apply_filters('woocommerce_freight_origin_country_code',
+            WC()->countries->get_base_country());
 
         $this->api_url = $this->get_option('api_url');
         $this->api_user = $this->get_option('api_user');
@@ -168,7 +174,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Get packages. Divide the WC package into packages/parcels
      *
-     * @param   array  $package
+     * @param  array  $package
+     *
      * @return  array
      * @since   2.0.0
      */
@@ -185,7 +192,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Get the freight class
      *
-     * @param   int     $shipping_class_id
+     * @param  int  $shipping_class_id
+     *
      * @return  string
      * @since   2.0.0
      */
@@ -199,7 +207,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Pack items individually.
      *
-     * @param   mixed  $package  Package to ship.
+     * @param  mixed  $package  Package to ship.
+     *
      * @return  mixed
      * @since   2.0.0
      */
@@ -217,7 +226,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             }
 
             if (!$values['data']->get_weight()) {
-                $this->debug(sprintf(__('Product <strong>'.$values['data']->get_title().' : %s</strong> is missing weight.', 'woocommerce-shipping-freight'),
+                $this->debug(sprintf(__('Product <strong>'.$values['data']->get_title().' : %s</strong> is missing weight.',
+                    'woocommerce-shipping-freight'),
                     $item_id), 'error');
 
                 $this->noShipping[] = $values['data'];
@@ -241,7 +251,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 $dimensions = [
                     $values['data']->get_length(),
                     $values['data']->get_width(),
-                    $values['data']->get_height()
+                    $values['data']->get_height(),
                 ];
 
                 sort($dimensions);
@@ -264,6 +274,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * Build the XML request
      *
      * @param  mixed  $package
+     *
      * @return SimpleXMLElement
      * @since 2.0.0
      */
@@ -273,13 +284,15 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
         // Arbitrary but valid future dates.
         // Required by the API, but not for quoting, for reasons.
-        if (!array_key_exists('DropDate', $data))
+        if (!array_key_exists('DropDate', $data)) {
             $DropDate = (new DateTime('tomorrow'))->format('m/d/Y H:i');
+        }
 
-        if (!array_key_exists('Pickup', $data))
+        if (!array_key_exists('Pickup', $data)) {
             $Pickup = (new DateTime('+4 days'))->format('m/d/Y H:i');
+        }
 
-        $this->writer = new XMLWriter;
+        $this->writer = new XMLWriter();
 
         $sServiceFlagPickup = 'LGDC';
         $sServiceFlagDelivery = 'RSDC';
@@ -288,108 +301,109 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $sCarrierName = 'ESTES EXPRESS LINES';
 
         $this->writer->openMemory();
-            $this->writer->startDocument();
+        $this->writer->startDocument();
 
-                $this->writer->startElement('service-request');
-                    $this->writer->writeElement('service-id', 'XMLRating');
-                    $this->writer->writeElement('request-id', '08112016001');
+        $this->writer->startElement('service-request');
+        $this->writer->writeElement('service-id', 'XMLRating');
+        $this->writer->writeElement('request-id', '08112016001');
 
-                    $this->writer->startElement('data');
-                        $this->writer->startElement('RateRequest');
-                            $this->writer->startElement('Constraints');
+        $this->writer->startElement('data');
+        $this->writer->startElement('RateRequest');
+        $this->writer->startElement('Constraints');
 
-                                $this->writer->writeElement('Mode', $sMode);
+        $this->writer->writeElement('Mode', $sMode);
 
-                                $this->writer->startElement('ServiceFlags');
-                                    $this->writer->startElement('ServiceFlag');
-                                        $this->writer->writeAttribute('code', $sServiceFlagPickup);
-                                    $this->writer->endElement();
+        $this->writer->startElement('ServiceFlags');
+        $this->writer->startElement('ServiceFlag');
+        $this->writer->writeAttribute('code', $sServiceFlagPickup);
+        $this->writer->endElement();
 
-                                    $this->writer->startElement('ServiceFlag');
-                                        $this->writer->writeAttribute('code', $sServiceFlagDelivery);
-                                    $this->writer->endElement();
-                                $this->writer->endElement();
+        $this->writer->startElement('ServiceFlag');
+        $this->writer->writeAttribute('code', $sServiceFlagDelivery);
+        $this->writer->endElement();
+        $this->writer->endElement();
 
-                                $this->writer->writeElement('Contract', '');
+        $this->writer->writeElement('Contract', '');
 
-                                $this->writer->startElement('Carriers');
-                                    $this->writer->startElement('Carrier');
-                                        $this->writer->writeAttribute('name', $sCarrierName);
-                                    $this->writer->endElement();
-                                $this->writer->endElement();
+        $this->writer->startElement('Carriers');
+        $this->writer->startElement('Carrier');
+        $this->writer->writeAttribute('name', $sCarrierName);
+        $this->writer->endElement();
+        $this->writer->endElement();
 
-                                //$this->writer->writeElement('Carrier', '');
-                                $this->writer->writeElement('PaymentTerms', '');
+        //$this->writer->writeElement('Carrier', '');
+        $this->writer->writeElement('PaymentTerms', '');
 
-                            $this->writer->endElement();
+        $this->writer->endElement();
 
-                            $this->writer->startElement('Items');
-                                foreach ($data as $product) {
-                                    /**
-                                     * Even though the API doesn't seem to care about additional quantities,
-                                     * we're still sending it each item in the cart explicitly.
-                                     * Insert hopeful verbose reason here.
-                                     */
-                                    for ($i = 1; $i <= $product['Quantity']; $i++) {
-                                        $this->writer->startElement('Item');
-                                            $this->writer->writeAttribute('sequence', $i);
-                                            $this->writer->writeAttribute('freightClass', $sFreightClass);
-                                            $this->writer->writeAttribute('type', 'item');
-                                            $this->writer->writeAttribute('sequenceGroup', $product['GroupNumber']);
+        $this->writer->startElement('Items');
+        foreach ($data as $product) {
+            /**
+             * Even though the API doesn't seem to care about additional quantities,
+             * we're still sending it each item in the cart explicitly.
+             * Insert hopeful verbose reason here.
+             */
+            for ($i = 1; $i <= $product['Quantity']; $i++) {
+                $this->writer->startElement('Item');
+                $this->writer->writeAttribute('sequence', $i);
+                $this->writer->writeAttribute('freightClass', $sFreightClass);
+                $this->writer->writeAttribute('type', 'item');
+                $this->writer->writeAttribute('sequenceGroup', $product['GroupNumber']);
 
-                                            $this->writer->startElement('Weight');
-                                                $this->writer->writeAttribute('units', $product['Weight']['Units']); // old value: lb
-                                                $this->writer->text($product['Weight']['Value']);
-                                            $this->writer->endElement();
-
-                                            $this->writer->startElement('Dimensions');
-                                                $this->writer->writeAttribute('length', $product['Dimensions']['Length']);
-                                                $this->writer->writeAttribute('width', $product['Dimensions']['Width']);
-                                                $this->writer->writeAttribute('height', $product['Dimensions']['Height']);
-                                                $this->writer->writeAttribute('units', $product['Dimensions']['Units']); // old value: inches
-                                            $this->writer->endElement();
-                                        $this->writer->endElement();
-                                    }
-                                }
-                            $this->writer->endElement();
-
-                            $this->writer->startElement('Events');
-
-                                $this->writer->startElement('Event');
-                                    $this->writer->writeAttribute('sequence', 1);
-                                    $this->writer->writeAttribute('type', 'Pickup');
-                                    $this->writer->writeAttribute('date', $Pickup);
-
-                                    $this->writer->startElement('Location');
-                                        $this->writer->writeElement('Zip', $this->origin);
-                                        $this->writer->writeElement('Country', 'USA');
-                                    $this->writer->endElement();
-                                $this->writer->endElement();
-
-                                $this->writer->startElement('Event');
-                                    $this->writer->writeAttribute('sequence', 2);
-                                    $this->writer->writeAttribute('type', 'Drop');
-                                    $this->writer->writeAttribute('date', $DropDate. "12:01");
-
-                                    $this->writer->startElement('Location');
-                                        $this->writer->writeElement('Zip', $this->package['destination']['postcode']);
-                                        $this->writer->writeElement('Country', 'USA');
-                                    $this->writer->endElement();
-                                $this->writer->endElement();
-
-                            $this->writer->endElement();
-
-                            $this->writer->writeElement('ReferenceNumbers', '69696969696');
-
-                        $this->writer->endElement();
-                    $this->writer->endElement();
+                $this->writer->startElement('Weight');
+                $this->writer->writeAttribute('units', $product['Weight']['Units']); // old value: lb
+                $this->writer->text($product['Weight']['Value']);
                 $this->writer->endElement();
-            $this->writer->endDocument();
+
+                $this->writer->startElement('Dimensions');
+                $this->writer->writeAttribute('length', $product['Dimensions']['Length']);
+                $this->writer->writeAttribute('width', $product['Dimensions']['Width']);
+                $this->writer->writeAttribute('height', $product['Dimensions']['Height']);
+                $this->writer->writeAttribute('units', $product['Dimensions']['Units']); // old value: inches
+                $this->writer->endElement();
+                $this->writer->endElement();
+            }
+        }
+        $this->writer->endElement();
+
+        $this->writer->startElement('Events');
+
+        $this->writer->startElement('Event');
+        $this->writer->writeAttribute('sequence', 1);
+        $this->writer->writeAttribute('type', 'Pickup');
+        $this->writer->writeAttribute('date', $Pickup);
+
+        $this->writer->startElement('Location');
+        $this->writer->writeElement('Zip', $this->origin);
+        $this->writer->writeElement('Country', 'USA');
+        $this->writer->endElement();
+        $this->writer->endElement();
+
+        $this->writer->startElement('Event');
+        $this->writer->writeAttribute('sequence', 2);
+        $this->writer->writeAttribute('type', 'Drop');
+        $this->writer->writeAttribute('date', $DropDate."12:01");
+
+        $this->writer->startElement('Location');
+        $this->writer->writeElement('Zip', $this->package['destination']['postcode']);
+        $this->writer->writeElement('Country', 'USA');
+        $this->writer->endElement();
+        $this->writer->endElement();
+
+        $this->writer->endElement();
+
+        $this->writer->writeElement('ReferenceNumbers', '69696969696');
+
+        $this->writer->endElement();
+        $this->writer->endElement();
+        $this->writer->endElement();
+        $this->writer->endDocument();
 
         $payload = $this->writer->outputMemory(true);
 
         $this->debug('FREIGHT SHIPPING REQUEST (get_freight_api_request:391): <a href="#" class="debug_reveal">Reveal</a>
-            <pre class="debug_info">API endpoint: '.$this->api_url.'<br />Payload: '.print_r(json_decode(json_encode(simplexml_load_string($payload)), true), true).'</pre>'
+            <pre class="debug_info">API endpoint: '.$this->api_url.'<br />Payload: '.print_r(json_decode(json_encode(simplexml_load_string($payload)),
+                true), true).'</pre>'
         );
 
         return apply_filters('woocommerce_freight_api_request', $payload);
@@ -400,6 +414,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * This is the 'first' method called by WooCommerce
      *
      * @param  mixed  $package  Package to ship.
+     *
      * @return void
      * @since  2.0.0
      */
@@ -450,7 +465,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Actually execute the API request call.
      *
-     * @param   mixed  $request
+     * @param  mixed  $request
+     *
      * @return  SimpleXMLElement $result
      * @since   2.0.0
      */
@@ -481,7 +497,6 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
             $rates = base64_decode($response->data[0]);
             $result = simplexml_load_string($rates);
-
         } catch (Exception $e) {
             $this->debug('EXCEPTION : '.$e->getMessage().'<a href="#" class="debug_reveal">Reveal</a>
                 <pre class="debug_info">'.print_r([$data, $options, $response], true).'</pre>');
@@ -507,6 +522,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * (Mostly just hand-off, as is. Use as needed)
      *
      * @param  mixed  $result
+     *
      * @return mixed
      * @since  2.0.0
      */
@@ -531,7 +547,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $PriceSheets = $result->PriceSheets;
 
         $this->found_rates = [
-            $this->prepare_rate($PriceSheets->PriceSheet->Total, $PriceSheets->PriceSheet->Service ?? false, $packages)
+            $this->prepare_rate($PriceSheets->PriceSheet->Total, $PriceSheets->PriceSheet->Service ?? false, $packages),
         ];
 
         $this->add_found_rates();
@@ -540,8 +556,9 @@ class WC_Shipping_Freight extends WC_Shipping_Method
     /**
      * Prepare the shipping rates for the cart
      *
-     * @param  string|int  $total   Itemized total for the service
-     * @param  string      $service Shipping service offered
+     * @param  string|int  $total    Itemized total for the service
+     * @param  string      $service  Shipping service offered
+     *
      * @since  2.0.0
      */
     private function prepare_rate($total, $service, $items)
@@ -574,7 +591,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
             'cost' => $rate_cost,
             'sort' => 1,
             'packages' => $packages,
-            'crates' => $crates
+            'crates' => $crates,
         ];
     }
 
@@ -587,7 +604,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      * Handle items with quantities greater than 1, since the API doesn't
      * seem to care for reasons.
      *
-     * @param   array   $meta   Meta data on packages, weight, etc.
+     * @param  array  $meta  Meta data on packages, weight, etc.
+     *
      * @return  mixed           Number of crates with appropriate fees
      * @since   2.0.0
      */
@@ -614,7 +632,8 @@ class WC_Shipping_Freight extends WC_Shipping_Method
                 case $div > 2:
                     $crates += $item['Quantity'];
                     break;
-                default: $crates = 1;
+                default:
+                    $crates = 1;
             }
         }
 
@@ -647,6 +666,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
      *
      * @param  mixed  $a
      * @param  mixed  $b
+     *
      * @return int
      * @since  2.0.0
      */

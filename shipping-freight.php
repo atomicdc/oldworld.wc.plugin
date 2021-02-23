@@ -5,8 +5,9 @@
  *
  * @since 2.0.0
  */
-if (!defined('ABSPATH'))
+if (!defined('ABSPATH')) {
     exit;
+}
 
 $active_plugins = get_option('active_plugins', []);
 
