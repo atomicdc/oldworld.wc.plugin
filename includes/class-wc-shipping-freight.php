@@ -297,106 +297,112 @@ class WC_Shipping_Freight extends WC_Shipping_Method
         $sServiceFlagPickup = 'LGDC';
         $sServiceFlagDelivery = 'RSDC';
         $sMode = 'LTL';
-        $sFreightClass = '60';
-        $sCarrierName = 'ESTES EXPRESS LINES';
+        $sFreightClass = '070';
+        $sCarrierName = 'OLD DOMINION FREIGHT LINE INC';
+        //$sCarrierName = 'ESTES EXPRESS LINES';
 
         $this->writer->openMemory();
-        $this->writer->startDocument();
 
-        $this->writer->startElement('service-request');
-        $this->writer->writeElement('service-id', 'XMLRating');
-        $this->writer->writeElement('request-id', '08112016001');
+            $this->writer->startDocument();
 
-        $this->writer->startElement('data');
-        $this->writer->startElement('RateRequest');
-        $this->writer->startElement('Constraints');
+                $this->writer->startElement('service-request');
+                    $this->writer->writeElement('service-id', 'XMLRating');
+                    $this->writer->writeElement('request-id', '08112016001');
 
-        $this->writer->writeElement('Mode', $sMode);
+                    $this->writer->startElement('data');
+                        $this->writer->startElement('RateRequest');
+                            $this->writer->startElement('Constraints');
 
-        $this->writer->startElement('ServiceFlags');
-        $this->writer->startElement('ServiceFlag');
-        $this->writer->writeAttribute('code', $sServiceFlagPickup);
-        $this->writer->endElement();
+                                $this->writer->writeElement('Mode', $sMode);
 
-        $this->writer->startElement('ServiceFlag');
-        $this->writer->writeAttribute('code', $sServiceFlagDelivery);
-        $this->writer->endElement();
-        $this->writer->endElement();
+                                $this->writer->startElement('ServiceFlags');
+                                    $this->writer->startElement('ServiceFlag');
+                                        $this->writer->writeAttribute('code', $sServiceFlagPickup);
+                                    $this->writer->endElement();
 
-        $this->writer->writeElement('Contract', '');
+                                    $this->writer->startElement('ServiceFlag');
+                                        $this->writer->writeAttribute('code', $sServiceFlagDelivery);
+                                    $this->writer->endElement();
+                                $this->writer->endElement();
 
-        $this->writer->startElement('Carriers');
-        $this->writer->startElement('Carrier');
-        $this->writer->writeAttribute('name', $sCarrierName);
-        $this->writer->endElement();
-        $this->writer->endElement();
+                                $this->writer->writeElement('Contract', '');
 
-        //$this->writer->writeElement('Carrier', '');
-        $this->writer->writeElement('PaymentTerms', '');
+                                $this->writer->startElement('Carriers');
+                                    $this->writer->startElement('Carrier');
+                                        $this->writer->writeAttribute('name', $sCarrierName);
+                                    $this->writer->endElement();
+                                $this->writer->endElement();
 
-        $this->writer->endElement();
+                                //$this->writer->writeElement('Carrier', '');
+                                $this->writer->writeElement('PaymentTerms', '');
 
-        $this->writer->startElement('Items');
-        foreach ($data as $product) {
-            /**
-             * Even though the API doesn't seem to care about additional quantities,
-             * we're still sending it each item in the cart explicitly.
-             * Insert hopeful verbose reason here.
-             */
-            for ($i = 1; $i <= $product['Quantity']; $i++) {
-                $this->writer->startElement('Item');
-                $this->writer->writeAttribute('sequence', $i);
-                $this->writer->writeAttribute('freightClass', $sFreightClass);
-                $this->writer->writeAttribute('type', 'item');
-                $this->writer->writeAttribute('sequenceGroup', $product['GroupNumber']);
+                            $this->writer->endElement();
 
-                $this->writer->startElement('Weight');
-                $this->writer->writeAttribute('units', $product['Weight']['Units']); // old value: lb
-                $this->writer->text($product['Weight']['Value']);
-                $this->writer->endElement();
+                            $this->writer->startElement('Items');
+                                foreach ($data as $product) {
+                                    /**
+                                     * Even though the API doesn't seem to care about additional quantities,
+                                     * we're still sending it each item in the cart explicitly.
+                                     * Insert hopeful verbose reason here.
+                                     */
+                                    for ($i = 1; $i <= $product['Quantity']; $i++) {
+                                        $this->writer->startElement('Item');
+                                            $this->writer->writeAttribute('sequence', $i);
+                                            $this->writer->writeAttribute('freightClass', $sFreightClass);
+                                            $this->writer->writeAttribute('type', 'item');
+                                            $this->writer->writeAttribute('sequenceGroup', $product['GroupNumber']);
 
-                $this->writer->startElement('Dimensions');
-                $this->writer->writeAttribute('length', $product['Dimensions']['Length']);
-                $this->writer->writeAttribute('width', $product['Dimensions']['Width']);
-                $this->writer->writeAttribute('height', $product['Dimensions']['Height']);
-                $this->writer->writeAttribute('units', $product['Dimensions']['Units']); // old value: inches
-                $this->writer->endElement();
+                                            $this->writer->startElement('Weight');
+                                                $this->writer->writeAttribute('units', $product['Weight']['Units']); // old value: lb
+                                                $this->writer->text($product['Weight']['Value']);
+                                            $this->writer->endElement();
+
+                                            $this->writer->startElement('Dimensions');
+                                                $this->writer->writeAttribute('length', $product['Dimensions']['Length']);
+                                                $this->writer->writeAttribute('width', $product['Dimensions']['Width']);
+                                                $this->writer->writeAttribute('height', $product['Dimensions']['Height']);
+                                                $this->writer->writeAttribute('units', $product['Dimensions']['Units']); // old value: inches
+                                            $this->writer->endElement();
+                                        $this->writer->endElement();
+                                    }
+                                }
+                            $this->writer->endElement();
+
+                            $this->writer->startElement('Events');
+
+                                $this->writer->startElement('Event');
+                                    $this->writer->writeAttribute('sequence', 1);
+                                    $this->writer->writeAttribute('type', 'Pickup');
+                                    $this->writer->writeAttribute('date', $Pickup);
+
+                                    $this->writer->startElement('Location');
+                                        $this->writer->writeElement('Zip', $this->origin);
+                                        $this->writer->writeElement('Country', 'USA');
+                                    $this->writer->endElement();
+                                $this->writer->endElement();
+
+                                $this->writer->startElement('Event');
+                                    $this->writer->writeAttribute('sequence', 2);
+                                    $this->writer->writeAttribute('type', 'Drop');
+                                    $this->writer->writeAttribute('date', $DropDate);
+
+                                    $this->writer->startElement('Location');
+                                        $this->writer->writeElement('Zip', $this->package['destination']['postcode']);
+                                        $this->writer->writeElement('Country', 'USA');
+                                    $this->writer->endElement();
+                                $this->writer->endElement();
+
+                            $this->writer->endElement();
+
+                            $this->writer->writeElement('ReferenceNumbers', '69696969696');
+
+                        $this->writer->endElement();
+                    $this->writer->endElement();
                 $this->writer->endElement();
             }
         }
         $this->writer->endElement();
 
-        $this->writer->startElement('Events');
-
-        $this->writer->startElement('Event');
-        $this->writer->writeAttribute('sequence', 1);
-        $this->writer->writeAttribute('type', 'Pickup');
-        $this->writer->writeAttribute('date', $Pickup);
-
-        $this->writer->startElement('Location');
-        $this->writer->writeElement('Zip', $this->origin);
-        $this->writer->writeElement('Country', 'USA');
-        $this->writer->endElement();
-        $this->writer->endElement();
-
-        $this->writer->startElement('Event');
-        $this->writer->writeAttribute('sequence', 2);
-        $this->writer->writeAttribute('type', 'Drop');
-        $this->writer->writeAttribute('date', $DropDate."12:01");
-
-        $this->writer->startElement('Location');
-        $this->writer->writeElement('Zip', $this->package['destination']['postcode']);
-        $this->writer->writeElement('Country', 'USA');
-        $this->writer->endElement();
-        $this->writer->endElement();
-
-        $this->writer->endElement();
-
-        $this->writer->writeElement('ReferenceNumbers', '69696969696');
-
-        $this->writer->endElement();
-        $this->writer->endElement();
-        $this->writer->endElement();
         $this->writer->endDocument();
 
         $payload = $this->writer->outputMemory(true);
@@ -481,7 +487,7 @@ class WC_Shipping_Freight extends WC_Shipping_Method
 
             $options = [
                 'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'header' => "Content-type: application/x-www-form-urlencoded",
                     'method' => 'POST',
                     'content' => http_build_query($data),
                 ],
